@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Project                 : XdmfUtil
+  Project                 : XdmfGenerator
   Module                  : XdmfHDFDOM.h
 
   Authors:
@@ -53,7 +53,7 @@
 #ifndef XDMFHDFDOM_H
 #define XDMFHDFDOM_H
 
-#include "XdmfUtilconfig.h"
+#include "XdmfGeneratorconfig.h"
 #include "XdmfLightData.h"
 
 class XdmfHDFDOM : public XdmfLightData {

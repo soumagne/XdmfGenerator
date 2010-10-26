@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Project                 : XdmfUtil
+  Project                 : XdmfGenerator
   Module                  : FileSeriesFinder.h
 
   Authors:
@@ -25,7 +25,7 @@
 #ifndef FILESERIESFINDER_H
 #define FILESERIESFINDER_H
 
-#include "XdmfUtilconfig.h"
+#include "XdmfGeneratorconfig.h"
 #include <vtkstd/string>
 #include <vtkstd/vector>
 #include <vtkstd/map>

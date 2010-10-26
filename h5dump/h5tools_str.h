@@ -37,7 +37,7 @@
 #ifndef H5TOOLS_STR_H__
 #define H5TOOLS_STR_H__
 
-#include "XdmfUtilconfig.h"
+#include "XdmfGeneratorconfig.h"
 
 typedef struct h5tools_str_t {
     char    *s;     /*allocate string       */

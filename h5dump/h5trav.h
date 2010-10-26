@@ -33,7 +33,7 @@
 #ifndef H5TRAV_H__
 #define H5TRAV_H__
 
-#include "XdmfUtilconfig.h"
+#include "XdmfGeneratorconfig.h"
 #ifdef USE_MPI
 #include "mpi.h"
 #endif

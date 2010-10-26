@@ -20,7 +20,7 @@
 #ifndef H5TOOLS_REDIRECT_H__
 #define H5TOOLS_REDIRECT_H__
 
-#include "XdmfUtilconfig.h"
+#include "XdmfGeneratorconfig.h"
 extern "C" {
 #include "H5Fprivate.h"
 }

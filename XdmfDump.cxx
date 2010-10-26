@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Project                 : XdmfUtil
+  Project                 : XdmfGenerator
   Module                  : XdmfDump.cxx
 
   Authors:

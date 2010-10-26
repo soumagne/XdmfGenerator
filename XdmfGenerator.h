@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Project                 : XdmfUtil
+  Project                 : XdmfGenerator
   Module                  : XdmfGenerator.h
 
   Authors:
@@ -25,7 +25,7 @@
 #ifndef XDMFGENERATOR_H
 #define XDMFGENERATOR_H
 
-#include "XdmfUtilconfig.h"
+#include "XdmfGeneratorconfig.h"
 #include "XdmfLightData.h"
 
 #include "XdmfDOM.h"

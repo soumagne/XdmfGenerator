@@ -1,4 +1,4 @@
-PROJECT("XDMF_UTIL")
+PROJECT("XDMF_GENERATOR")
 
 CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
 
@@ -47,7 +47,7 @@ IF(NOT USE_H5FD_DSM)
   # FIND_PATH(HDF5_SOURCE_DIR "path to the source directory of HDF5")
   # INCLUDE_DIRECTORIES(${HDF5_SOURCE_DIR})
 
-  SET(XdmfUtil_SRCS
+  SET(XdmfGenerator_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5dump.cxx
     ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools.cxx
     ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools_str.cxx
@@ -57,7 +57,7 @@ IF(NOT USE_H5FD_DSM)
     ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5trav.cxx
   )
 ELSE(NOT USE_H5FD_DSM)
-  SET(XdmfUtil_SRCS "")
+  SET(XdmfGenerator_SRCS "")
 ENDIF(NOT USE_H5FD_DSM)
 
 INCLUDE_DIRECTORIES(
@@ -66,8 +66,8 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_BINARY_DIR}
   )
 
-SET(XdmfUtil_SRCS
-  ${XdmfUtil_SRCS}
+SET(XdmfGenerator_SRCS
+  ${XdmfGenerator_SRCS}
   ${CMAKE_CURRENT_SOURCE_DIR}/XdmfGenerator.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/XdmfHDFDOM.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/FileSeriesFinder.cxx
@@ -75,20 +75,20 @@ SET(XdmfUtil_SRCS
   )
 
 IF(VTK_BUILD_SHARED_LIBS OR BUILD_SHARED_LIBS)
-  SET(XdmfUtil_LIBTYPE SHARED)
+  SET(XdmfGenerator_LIBTYPE SHARED)
 ELSE(VTK_BUILD_SHARED_LIBS OR BUILD_SHARED_LIBS)
-  SET(XdmfUtil_LIBTYPE STATIC)
+  SET(XdmfGenerator_LIBTYPE STATIC)
 ENDIF(VTK_BUILD_SHARED_LIBS OR BUILD_SHARED_LIBS)
 
 CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfUtilconfig.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/XdmfUtilconfig.h)
+  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfGeneratorconfig.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/XdmfGeneratorconfig.h)
 
-ADD_LIBRARY(XdmfUtil ${XdmfUtil_LIBTYPE} ${XdmfUtil_SRCS})
-TARGET_LINK_LIBRARIES(XdmfUtil Xdmf vtksys)
+ADD_LIBRARY(XdmfGenerator ${XdmfGenerator_LIBTYPE} ${XdmfGenerator_SRCS})
+TARGET_LINK_LIBRARIES(XdmfGenerator Xdmf vtksys)
 
 ADD_EXECUTABLE(XdmfGenerate ${CMAKE_CURRENT_SOURCE_DIR}/XdmfGenerate.cxx)
-TARGET_LINK_LIBRARIES(XdmfGenerate XdmfUtil)
+TARGET_LINK_LIBRARIES(XdmfGenerate XdmfGenerator)
 
 #--------------------------------------------------
 # Install
@@ -102,7 +102,7 @@ INSTALL(
 
 INSTALL(
   TARGETS
-    XdmfUtil
+    XdmfGenerator
   DESTINATION 
     "${CMAKE_INSTALL_PREFIX}/lib/paraview-${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}"
 )
