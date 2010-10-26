@@ -44,8 +44,8 @@ IF(NOT USE_H5FD_DSM)
   ENDIF(ParaView_BINARY_DIR)
 
   # temporary here but will be removed when next versions of ParaView integrate hdf5-1.8
-  FIND_PATH(HDF5_SOURCE_DIR "path to the source directory of HDF5")
-  INCLUDE_DIRECTORIES(${HDF5_SOURCE_DIR})
+  # FIND_PATH(HDF5_SOURCE_DIR "path to the source directory of HDF5")
+  # INCLUDE_DIRECTORIES(${HDF5_SOURCE_DIR})
 
   SET(XdmfUtil_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5dump.cxx
