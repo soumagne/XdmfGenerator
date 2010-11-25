@@ -1,5 +1,47 @@
 <?xml version="1.0" ?>
 <Xdmf>
+  <Interaction>
+    <IntVectorProperty name="Parameter1"
+      label="This is a steering scalar test 1" 
+      number_of_elements="1"
+      default_values="1">
+      <BooleanDomain/>
+      <Documentation>
+        steering scalar documentation for Parameter1
+    </Documentation>
+    </IntVectorProperty>
+    <IntVectorProperty name="Parameter2"
+      label="This is a steering scalar test 2" 
+      number_of_elements="1"
+      default_values="2">
+      <IntRangeDomain min="2" max="6"/>
+      <Documentation>
+        steering scalar documentation for Parameter2
+    </Documentation>
+    </IntVectorProperty>
+    <IntVectorProperty name="Parameter3"
+      label="This is a steering scalar test 3" 
+      number_of_elements="1"
+      default_values="3">
+      <Documentation>
+        steering scalar documentation for Parameter3
+    </Documentation>
+    </IntVectorProperty>
+    <IntVectorProperty name="Parameter4"
+      label="This is a steering scalar test 4" 
+      number_of_elements="1"
+      default_values="2">
+      <EnumerationDomain>
+        <Entry value="0" text="Entry0" />
+        <Entry value="1" text="Entry1" />
+        <Entry value="2" text="Entry2" />
+        <Entry value="3" text="Entry3" />
+      </EnumerationDomain>
+      <Documentation>
+        steering scalar documentation for Parameter4
+    </Documentation>
+    </IntVectorProperty>
+  </Interaction>
   <Domain>
     <Grid Name="PartType1">
       <Topology TopologyType="Polyvertex">
