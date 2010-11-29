@@ -19,14 +19,14 @@
         steering scalar documentation for Parameter2
     </Documentation>
     </IntVectorProperty>
-    <IntVectorProperty name="Parameter3"
+    <DoubleVectorProperty name="Parameter3"
       label="This is a steering scalar test 3" 
       number_of_elements="1"
-      default_values="3">
+      default_values="3.14159265">
       <Documentation>
         steering scalar documentation for Parameter3
     </Documentation>
-    </IntVectorProperty>
+    </DoubleVectorProperty>
     <IntVectorProperty name="Parameter4"
       label="This is a steering scalar test 4" 
       number_of_elements="1"
