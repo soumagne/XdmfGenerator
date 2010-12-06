@@ -1,17 +1,163 @@
 <?xml version="1.0" ?>
 <Xdmf>
+
+  <!-- ================================================================ -->
+  <!-- Interaction : These are user controlled objects/params           -->
+  <!-- ================================================================ -->
+
+  <Interaction>
+
+    <IntVectorProperty 
+      name="Parameter1"
+      command="SetSteeringValueInt_@@@"
+      label="Boolean test 1"
+      number_of_elements="1"
+      default_values="1">
+      <BooleanDomain name="bool"/>
+      <Documentation>
+        steering scalar documentation for Parameter1
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+      name="Enum1"
+      command="SetSteeringValueInt_@@@"
+      label="Enum test 2"
+      number_of_elements="1"
+      default_values="0">
+      <EnumerationDomain name="enum">
+        <Entry value="0" text="Entry0" />
+        <Entry value="1" text="Entry1" />
+        <Entry value="2" text="Entry2" />
+        <Entry value="3" text="Entry3" />
+      </EnumerationDomain>
+      <Documentation>
+        steering scalar documentation for Parameter2
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty name="Parameter2"
+      label="IntVector test"
+      command="SetSteeringValueInt_@@@"
+      number_of_elements="3"
+      default_values="1 0 0">
+      <Documentation>
+        steering scalar documentation for Parameter2
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+      name="ComputeMarchineCubes"
+      command="SetSteeringValueInt_@@@"
+      label="Compute Marching Cubes"
+      number_of_elements="1"
+      default_values="1" >
+      <BooleanDomain name="bool"/>
+      <Documentation>
+        Turn on/off generation of Marching cubes data
+      </Documentation>
+    </IntVectorProperty>
+
+    <DoubleVectorProperty
+      name="RotationSpeed"
+      command="SetSteeringValueDouble_@@@"
+      label="Rotation Speed of Turbine"
+      number_of_elements="1"
+      units="deg/s"
+      default_values="32" >
+      <DoubleRangeDomain name="range" min="0" max="12.5"/>
+      <Documentation>
+        User specified rotation speed of turbine runner
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <DoubleVectorProperty
+      name="AppliedForce"
+      command="SetSteeringValueDouble_@@@"
+      label="Force applied to paddle"
+      number_of_elements="3"
+      units="N"
+      default_values="0.0 0.0 0.0" >
+      <Widget Type="Point" />
+      <Documentation>
+        When a GUI control is used to push against the paddle
+        the force is returned to the simulation
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <!-- ======================== -->
+    <!-- Centre of Body           -->
+    <!-- ======================== -->
+    <DoubleVectorProperty
+      name="CentrePoint"
+      command="SetSteeringValueDouble_@@@"
+      label="Centre Of Free Body"
+      number_of_elements="3"
+      default_values="0 0 0" >
+      <!-- Associate this property with a supplied grid -->
+      <Grid name="Body" />
+      <!-- Manipulate this property with a point widget -->
+      <Widget name="Point" />
+      <!-- Constrain the property change by the algorithm (units m/s) -->
+      <Constraint name="Motion">
+        <Parameter name="DeltaT" max="0.01"/>
+      </Constraint> />
+      <!-- Initialize the property using this algorithm -->
+      <Constraint name="Initialization">
+        <Algorithm name="Centroid" />
+      </Constraint> />
+
+      <!-- Transform the property's associated grid using the following algorithm -->
+      <Constraint name="PostTransform">
+        <Grid name="Body" />
+        <Algorithm name="Centroid" />
+      </Constraint> />
+
+      <Documentation>
+        Used to map the CoG of a dataset to a point widget
+      </Documentation>
+    </DoubleVectorProperty>
+
+
+    <!--
+    <DataSetProperty
+    name="ModifiedParticles"
+    label="Updated positions of particles after user interaction" >
+    <GridDomain name="Particles"> </GridDomain>
+    <DataSetDomain>
+      <DataItem Name="x">/Step#0/X</DataItem>
+      <DataItem Name="y">/Step#0/Y</DataItem>
+      <DataItem Name="z">/Step#0/Z</DataItem>
+    </DataSetDomain>
+    <Documentation>
+      After an interaction with the geometry of the simulation
+      a new particle position list is available from the dataset
+      referenced.
+      The dataset referenced is the same one that was used to transmit
+      the particles to the steering GUI.
+    </Documentation>
+  </DataSetProperty>
+
+  <DataSetProperty
+    name="BoundaryForces"
+    label="User supplied forces for each point on boundary" >
+    <DataSetDomain>
+      <DataItem Name="x">/Generated/X</DataItem>
+      <DataItem Name="y">/Generated/Y</DataItem>
+      <DataItem Name="z">/Generated/Z</DataItem>
+    </DataSetDomain>
+    <Documentation>
+      Forces that are applied to boundary points are sent in this dataset.
+      This dataset does not corrspond to a dataset sent by the simulation
+      it references a new GUI generated dataset that did not exist previously.
+    </Documentation>
+  </DataSetProperty>
+-->
+
+  </Interaction>
+
   <Domain>
 
-    <interaction Type="Scalar" Name="Rotation Speed" ></interaction>
-    <interaction Type="Vector" Name="Applied Force">
-      <Tag 
-        Name="AppliedForce"
-        number_of_elements="3"
-        default_values="0.0 0.0 0.0" >
-      </Tag>
-      <WidgetDomain Type="MouseDrag"></WidgetDomain>
-    </interaction>
-    
     <Grid Name="Particles">
       <Topology TopologyType="Polyvertex">
       </Topology>
@@ -36,7 +182,7 @@
         <DataItem>/Step#0/Smooth</DataItem>
       </Attribute>
     </Grid>
-    
+
     <Grid Name="Marching Cubes">
       <Topology TopologyType="Triangle" BaseOffset="1">
         <DataItem Name="connectivity">/MC_Triangles/connectivity</DataItem>
@@ -56,8 +202,8 @@
         <DataItem>/MC_Nodes/Smooth</DataItem>
       </Attribute>
     </Grid>
-    
-    <Grid Name="Boundaries-0">
+
+    <Grid Name="Tank">
       <Topology TopologyType="Triangle" BaseOffset="1">
         <DataItem Name="connectivity">/Mesh_Triangles#0/connectivity</DataItem>
       </Topology>
@@ -82,8 +228,8 @@
         <DataItem>/Mesh_Nodes#0/Smooth</DataItem>
       </Attribute>
     </Grid>
-    
-    <Grid Name="Boundaries-1">
+
+    <Grid Name="Body">
       <Topology TopologyType="Triangle" BaseOffset="1">
         <DataItem Name="connectivity">/Mesh_Triangles#1/connectivity</DataItem>
       </Topology>
@@ -108,6 +254,7 @@
         <DataItem>/Mesh_Nodes#1/Smooth</DataItem>
       </Attribute>
     </Grid>
-    
+
   </Domain>
+
 </Xdmf>
