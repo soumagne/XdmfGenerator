@@ -1,43 +1,52 @@
 <?xml version="1.0" ?>
 <Xdmf>
   <Interaction>
+  
     <IntVectorProperty name="Parameter1"
+      command="SetSteeringValueInt_@@@"
       label="This is a steering scalar test 1" 
       number_of_elements="1"
       default_values="1">
-      <BooleanDomain/>
+      <BooleanDomain name="bool"/>
       <Documentation>
         steering scalar documentation for Parameter1
     </Documentation>
     </IntVectorProperty>
+    
     <IntVectorProperty name="Parameter2"
+      command="SetSteeringValueInt_@@@"
       label="This is a steering scalar test 2" 
-      number_of_elements="1"
-      default_values="2">
-      <IntRangeDomain min="2" max="6"/>
+      number_of_elements="3"
+      default_values="2 3 5">
+      <IntRangeDomain name="range" min="2" max="6"/>
       <Documentation>
         steering scalar documentation for Parameter2
     </Documentation>
     </IntVectorProperty>
+    
     <DoubleVectorProperty name="Parameter3"
+      command="SetSteeringValueDouble_@@@"
       label="This is a steering scalar test 3" 
       number_of_elements="1"
       default_values="3.14159265">
-      <DoubleRangeDomain min="3" max="4"/>
+      <DoubleRangeDomain name="range" min="3" max="4"/>
       <Documentation>
         steering scalar documentation for Parameter3
     </Documentation>
     </DoubleVectorProperty>
+    
     <IntVectorProperty name="Parameter4"
+      command="SetSteeringValueInt_@@@"
       label="This is a steering scalar test 4" 
       number_of_elements="1"
       default_values="2">
-      <EnumerationDomain>
+      <EnumerationDomain name="enum">
         <Entry value="0" text="Entry0" />
         <Entry value="1" text="Entry1" />
         <Entry value="2" text="Entry2" />
         <Entry value="3" text="Entry3" />
       </EnumerationDomain>
+      
       <Documentation>
         steering scalar documentation for Parameter4
     </Documentation>
