@@ -258,7 +258,7 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
       XdmfXmlNode hdfGeometryNode = this->FindConvertHDFPath(hdfDOM, geometryPath);
       if (!hdfGeometryNode) {
         XdmfDebug("Skipping node of path " << geometryPath);
-        std::cerr << "Geometry Absent : Aborting Grid " << grid->GetName() << std::endl;
+        // std::cerr << "Geometry Absent : Aborting Grid " << grid->GetName() << std::endl;
         abortgrid = true;
         continue;
       }
