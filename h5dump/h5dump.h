@@ -1,21 +1,4 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Project                 : vtkCSCS                                        *
- *  Module                  : h5dump.h                                       *
- *  Revision of last commit : $Rev: 1466 $                                   *
- *  Author of last commit   : $Author: biddisco $                            *
- *  Date of last commit     : $Date:: 2009-12-04 13:32:32 +0100 #$           *
- *                                                                           *
- *  Copyright (C) CSCS - Swiss National Supercomputing Centre.               *
- *  You may use modify and and distribute this code freely providing         *
- *  1) This copyright notice appears on all copies of source code            *
- *  2) An acknowledgment appears with any substantial usage of the code      *
- *  3) If this code is contributed to any other open source project, it      *
- *  must not be reformatted such that the indentation, bracketing or         *
- *  overall style is modified significantly.                                 *
- *                                                                           *
- *  This software is distributed WITHOUT ANY WARRANTY; without even the      *
- *  implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Copyright by The HDF Group.                                               *
  * Copyright by the Board of Trustees of the University of Illinois.         *
  * All rights reserved.                                                      *
@@ -35,31 +18,9 @@
 #ifndef H5DUMP_H__
 #define H5DUMP_H__
 
-#include "XdmfGeneratorconfig.h"
-
-#ifdef USE_MPI
-#include "mpi.h"
-#endif
-
-extern "C" {
 #include "hdf5.h"
-}
 
 #include <sstream>
-
-#if defined(_WIN32) && !defined(WIN32)
-# define WIN32
-#endif
-
-#if defined(WIN32)
-#  if defined(XdmfGenerator_EXPORTS)
-#    define H5DUMP_EXPORT __declspec( dllexport )
-#  else
-#    define H5DUMP_EXPORT __declspec( dllimport )
-#  endif
-#else
-#  define H5DUMP_EXPORT
-#endif
 
 #define H5DUMP_MAX_RANK     H5S_MAX_RANK
 
@@ -113,6 +74,11 @@ extern "C" {
 #define EXTERNAL_FILE   "EXTERNAL_FILE"
 #define FILLVALUE       "FILLVALUE"
 #define FILE_CONTENTS   "FILE_CONTENTS"
+#ifdef H5_HAVE_H5DUMP_PACKED_BITS
+#define PACKED_BITS     "PACKED_BITS"
+#define PACKED_OFFSET   "OFFSET"
+#define PACKED_LENGTH   "LENGTH"
+#endif
 
 #define BEGIN           "{"
 #define END             "}"
@@ -200,13 +166,14 @@ typedef struct h5dump_header_t {
 
 } h5dump_header_t;
 
-// H5 dump common functions
-H5DUMP_EXPORT int H5dump(int argc, char *argv[], void *dsmBuffer);
-H5DUMP_EXPORT int H5dump_xml(const char *fileName, std::ostringstream &);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-// DSM specific functions
-H5DUMP_EXPORT int H5dump_dsm(const char *fileName, void *dsmBuffer);
-H5DUMP_EXPORT int H5dump_dsm_light(const char *fileName, void *dsmBuffer);
-H5DUMP_EXPORT int H5dump_dsm_xml(const char *fileName, std::ostringstream &, void *dsmBuffer);
+H5TOOLS_DLL void H5dump(int argc, const char *argv[], std::ostringstream &stream, void *dsmBuffer);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  /* !H5DUMP_H__ */

@@ -1,31 +1,17 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *  Project                 : vtkCSCS                                        *
- *  Module                  : h5dump.h                                       *
- *  Revision of last commit : $Rev: 1460 $                                   *
- *  Author of last commit   : $Author: soumagne $                            *
- *  Date of last commit     : $Date:: 2009-12-02 18:38:09 +0100 #$           *
- *                                                                           *
- *  Copyright (C) CSCS - Swiss National Supercomputing Centre.               *
- *  You may use modify and and distribute this code freely providing         *
- *  1) This copyright notice appears on all copies of source code            *
- *  2) An acknowledgment appears with any substantial usage of the code      *
- *  3) If this code is contributed to any other open source project, it      *
- *  must not be reformatted such that the indentation, bracketing or         *
- *  overall style is modified significantly.                                 *
- *                                                                           *
- *  This software is distributed WITHOUT ANY WARRANTY; without even the      *
- *  implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #ifndef H5TOOLS_REDIRECT_H__
 #define H5TOOLS_REDIRECT_H__
 
-#include "XdmfGeneratorconfig.h"
+#ifdef __cplusplus
 extern "C" {
+#endif
+
 #include "H5Fprivate.h"
+
+#ifdef __cplusplus
 }
-#include <cstdarg>
-#include <cassert>
+#endif
+
 #include <cstdio>
 #include <iostream>
 #include <sstream>
@@ -33,11 +19,11 @@ extern "C" {
 /*
  * The global output stream replacing stdout
  */
-extern std::ostringstream output_stream;
-/*
- * The global print rank when used with DSM
- */
-extern int print_rank;
+extern std::ostringstream h5fd_dsm_dump_output_stream;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 static inline int h5tools_redirect_printf(const char *format, ...)
 {
@@ -47,7 +33,7 @@ static inline int h5tools_redirect_printf(const char *format, ...)
 
   va_start(args, format);
   nchars = vsprintf(buf, format, args);
-  output_stream << buf;
+  h5fd_dsm_dump_output_stream << buf;
   va_end(args);
   return nchars;
 }
@@ -84,7 +70,7 @@ static inline int h5tools_redirect_HDfprintf(FILE *stream, const char *fmt, ...)
     modifier[0] = '\0';
 
     if ('%'==fmt[0] && '%'==fmt[1]) {
-      output_stream << '%';
+      h5fd_dsm_dump_output_stream << '%';
       fmt += 2;
       nout++;
     } else if ('%'==fmt[0]) {
@@ -330,14 +316,14 @@ static inline int h5tools_redirect_HDfprintf(FILE *stream, const char *fmt, ...)
         break;
 
       default:
-        output_stream << format_templ;
+        h5fd_dsm_dump_output_stream << format_templ;
         n = (int)HDstrlen (format_templ);
         break;
       }
       nout += n;
       fmt = s;
     } else {
-      output_stream << *fmt;
+      h5fd_dsm_dump_output_stream << *fmt;
       fmt++;
       nout++;
     }
@@ -350,5 +336,9 @@ static inline int h5tools_redirect_HDfprintf(FILE *stream, const char *fmt, ...)
 #undef HDfprintf
 #endif
 #define HDfprintf h5tools_redirect_HDfprintf
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* H5TOOLS_REDIRECT_H__ */

@@ -38,34 +38,46 @@ XdmfDump::XdmfDump()
 //----------------------------------------------------------------------------
 XdmfDump::~XdmfDump()
 {
-    this->SetFileName(NULL);
+  this->SetFileName(NULL);
 }
 //----------------------------------------------------------------------------
 void
 XdmfDump::SetDsmBuffer(H5FDdsmBuffer *dsmBuffer)
 {
-    this->DsmBuffer = dsmBuffer;
+  this->DsmBuffer = dsmBuffer;
 }
 //----------------------------------------------------------------------------
 void
 XdmfDump::Dump()
 {
-    H5dump_dsm(this->FileName, this->DsmBuffer);
+  const char *argv[4]={"./h5dump", "-f", "dsm", this->FileName};
+  int print_rank;
+  std::ostringstream stream;
+  H5dump(4, (const char**) argv, stream, this->DsmBuffer);
+  MPI_Comm_rank(MPI_COMM_WORLD, &print_rank);
+  if(print_rank == 0) std::cout << stream.str() << std::endl;
 }
 //----------------------------------------------------------------------------
 void
 XdmfDump::DumpLight()
 {
-    H5dump_dsm_light(this->FileName, this->DsmBuffer);
+  const char *argv[5]={"./h5dump", "-f", "dsm", "-H", this->FileName};
+  int print_rank;
+  std::ostringstream stream;
+  H5dump(5, (const char**) argv, stream, this->DsmBuffer);
+  MPI_Comm_rank(MPI_COMM_WORLD, &print_rank);
+  if(print_rank == 0) std::cout << stream.str() << std::endl;
 }
 //----------------------------------------------------------------------------
 void
 XdmfDump::DumpXML(std::ostringstream &stream)
 {
   if (this->DsmBuffer) {
-    H5dump_dsm_xml(this->FileName, stream, this->DsmBuffer);
+    const char *argv[8] = {"./h5dump", "-f", "dsm", "-x", "-X", ":", "-H", this->FileName};
+    H5dump(8, (const char**) argv, stream, this->DsmBuffer);
   } else {
-    H5dump_xml(this->FileName, stream);
+    const char *argv[6] = {"./h5dump", "-x", "-X", ":", "-H", this->FileName};
+    H5dump(6, (const char**) argv, stream, NULL);
   }
 }
 //----------------------------------------------------------------------------
