@@ -7,42 +7,31 @@
 
   <Interaction>
 
-    <IntVectorProperty 
-      name="Parameter1"
+    <IntVectorProperty
+      name="NeighbourSearch"
       command="SetSteeringValueInt_@@@"
-      label="Boolean test 1"
+      label="Maximum Neighbour Count"
       number_of_elements="1"
-      default_values="1">
-      <BooleanDomain name="bool"/>
+      default_values="128">
+      <IntRangeDomain name="range" min="32" max="256"/>
       <Documentation>
-        steering scalar documentation for Parameter1
+        Limit the number of neighbours searched and increase computation speed accordingly
       </Documentation>
     </IntVectorProperty>
 
     <IntVectorProperty
-      name="Enum1"
+      name="Kernel"
       command="SetSteeringValueInt_@@@"
-      label="Enum test 2"
+      label="Kernel Type"
       number_of_elements="1"
-      default_values="0">
+      default_values="1">
       <EnumerationDomain name="enum">
-        <Entry value="0" text="Entry0" />
-        <Entry value="1" text="Entry1" />
-        <Entry value="2" text="Entry2" />
-        <Entry value="3" text="Entry3" />
+        <Entry value="0" text="Gaussian" />
+        <Entry value="1" text="Spline 3rd Order" />
+        <Entry value="2" text="Spline 5th Order" />
       </EnumerationDomain>
       <Documentation>
-        steering scalar documentation for Parameter2
-      </Documentation>
-    </IntVectorProperty>
-
-    <IntVectorProperty name="Parameter2"
-      label="IntVector test"
-      command="SetSteeringValueInt_@@@"
-      number_of_elements="3"
-      default_values="1 0 0">
-      <Documentation>
-        steering scalar documentation for Parameter2
+        Specify the Kernel used
       </Documentation>
     </IntVectorProperty>
 
@@ -59,26 +48,12 @@
     </IntVectorProperty>
 
     <DoubleVectorProperty
-      name="RotationSpeed"
-      command="SetSteeringValueDouble_@@@"
-      label="Rotation Speed of Turbine"
-      number_of_elements="1"
-      units="deg/s"
-      default_values="32" >
-      <DoubleRangeDomain name="range" min="0" max="12.5"/>
-      <Documentation>
-        User specified rotation speed of turbine runner
-      </Documentation>
-    </DoubleVectorProperty>
-
-    <DoubleVectorProperty
       name="AppliedForce"
       command="SetSteeringValueDouble_@@@"
       label="Force applied to paddle"
       number_of_elements="3"
       units="N"
       default_values="0.0 0.0 0.0" >
-      <Widget Type="Point" />
       <Documentation>
         When a GUI control is used to push against the paddle
         the force is returned to the simulation
@@ -89,35 +64,39 @@
     <!-- Centre of Body           -->
     <!-- ======================== -->
     <DoubleVectorProperty
-      name="CentrePoint"
+      name="FreeBodyCentre"
       command="SetSteeringValueDouble_@@@"
       label="Centre Of Free Body"
       number_of_elements="3"
       default_values="0 0 0" >
-      <!-- Associate this property with a supplied grid -->
-      <Grid name="Body" />
-      <!-- Manipulate this property with a point widget -->
-      <Widget name="Point" />
-      <!-- Constrain the property change by the algorithm (units m/s) -->
-      <Constraint name="Motion">
-        <Parameter name="DeltaT" max="0.01"/>
-      </Constraint> />
-      <!-- Initialize the property using this algorithm -->
-      <Constraint name="Initialization">
-        <Algorithm name="Centroid" />
-      </Constraint> />
+      <Hints>
+        <!-- Associate this property with a supplied grid -->
+        <AssociatedGrid name="Body" />
+        <!-- Manipulate this property with a point widget -->
+        <WidgetControl name="Box" />
+        <!-- Initialize the property using this algorithm -->
+        <Initialization name="BBoxCentre" />
+        <!-- Constrain the property change by the algorithm (units m/s) -->
+        <Constraint name="Motion">
+          <Parameter name="DeltaT" max="0.01"/>
+        </Constraint> />
 
-      <!-- Transform the property's associated grid using the following algorithm -->
-      <Constraint name="PostTransform">
-        <Grid name="Body" />
-        <Algorithm name="Centroid" />
-      </Constraint> />
+        <!-- Transform the property's associated grid using the following algorithm -->
+        <Finalization name="Transform" />
+      </Hints>
 
       <Documentation>
         Used to map the CoG of a dataset to a point widget
       </Documentation>
     </DoubleVectorProperty>
 
+    <DataSetProperty
+      name="Body"
+      label="User supplied forces for each point on boundary" >
+      <Hints>
+        <AssociatedGrid name="Body" />
+      </Hints>
+    </DataSetProperty>
 
     <!--
     <DataSetProperty
