@@ -164,7 +164,7 @@
 
     <Grid Name="Marching Cubes">
       <Topology TopologyType="Triangle" BaseOffset="1">
-        <DataItem Name="connectivity">/MC_Triangles/connectivity</DataItem>
+        <DataItem Name="connectivity">/MC_Triangles#0/connectivity</DataItem>
       </Topology>
       <Geometry GeometryType="X_Y_Z">
         <DataItem Name="x">/MC_Nodes/X</DataItem>
