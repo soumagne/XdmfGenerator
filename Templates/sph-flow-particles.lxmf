@@ -6,6 +6,36 @@
   <!-- ================================================================ -->
 
   <Interaction>
+  <!-- 
+    Time range can be set by the simulation and read by the server
+  -->
+    <DoubleVectorProperty
+      name="TimeRange"
+      command="SetSteeringValueDouble_@@@"
+      number_of_elements="2"
+      default_values="0.0 100.0"
+      information_property="TimeRangeInfo">
+      <DoubleRangeDomain name="range" />
+    </DoubleVectorProperty>
+
+    <DoubleVectorProperty 
+      name="TimeRangeInfo"
+      command="GetSteeringValueDouble_@@@"
+      information_only="1">
+      <SimpleDoubleInformationHelper/>
+    </DoubleVectorProperty>
+
+    <DoubleVectorProperty
+      name="InletVelocity"
+      command="SetSteeringValueDouble_@@@"
+      label="Inlet Fluid Velocity"
+      number_of_elements="3"
+      default_values="1.0 0.0 0.0">
+      <DoubleRangeDomain name="range" min="-5.0 -0.5 -0.5" max="5.0 0.5 0.5"/>
+      <Documentation>
+        Set the velocity of the input flow (don't exceed Speed of sound/3)
+      </Documentation>
+    </DoubleVectorProperty>
 
     <IntVectorProperty
       name="NeighbourSearch"
@@ -218,15 +248,6 @@
         <DataItem Name="z">/Mesh_Nodes#1/Z</DataItem>
       </Geometry>
       <Attribute>
-        <DataItem>/Mesh_Nodes#1/VX</DataItem>
-      </Attribute>
-      <Attribute>
-        <DataItem>/Mesh_Nodes#1/VY</DataItem>
-      </Attribute>
-      <Attribute>
-        <DataItem>/Mesh_Nodes#1/VZ</DataItem>
-      </Attribute>
-      <Attribute>
         <DataItem>/Mesh_Nodes#1/P</DataItem>
       </Attribute>
       <Attribute>
@@ -237,3 +258,12 @@
   </Domain>
 
 </Xdmf>
+<!-- 
+      <Attribute AttributeType="Vector" Name="Velocity">
+        <DataItem Function="JOIN($0, $1, $2)" ItemType="Function">
+          <DataItem >/Step#0/VX</DataItem>
+          <DataItem >/Step#0/VY</DataItem>
+          <DataItem >/Step#0/VZ</DataItem>
+        </DataItem>
+      </Attribute>
+-->
