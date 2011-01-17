@@ -316,15 +316,10 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
       XdmfAttribute  *attribute        = new XdmfAttribute();
       XdmfXmlNode     attributeNode    = lXdmfDOM->FindElement("Attribute", currentAttributeIndex, gridNode);
       XdmfXmlNode     attributeDINode  = lXdmfDOM->FindElement("DataItem", 0, attributeNode);
-      XdmfConstString attributePath    = lXdmfDOM->GetCData(attributeDINode);
-      XdmfXmlNode     hdfAttributeNode = this->FindConvertHDFPath(hdfDOM, attributePath);
+      XdmfInt32       attributeDIType  = this->FindDataItemType(lXdmfDOM, attributeDINode);
+      XdmfConstString attributePath    = NULL;
+      XdmfXmlNode     hdfAttributeNode = NULL;
       XdmfConstString attributeData    = NULL;
-
-      if (!hdfAttributeNode) {
-        // The node does not exist in the HDF DOM so do not generate it
-        XdmfDebug("Skipping node of path " << attributePath);
-        continue;
-      }
 
       // Set Attribute Name, use one from template if it exists
       XdmfString attributeName = (XdmfString) lXdmfDOM->GetAttribute(attributeNode, "Name");
@@ -332,23 +327,86 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
         attribute->SetName(attributeName);
         free(attributeName);
       }
-      else {
-        vtksys::RegularExpression reName("/([^/]*)$");
-        reName.find(attributePath);
-        std::string tmpName = std::string("attribute_") + reName.match(1).c_str();
-        XdmfDebug("Attribute name: " << tmpName.c_str());
-        attribute->SetName(tmpName.c_str());
+
+      // Check Data Item Type
+      if (attributeDIType == XDMF_ITEM_FUNCTION) {
+
+        std::string dataItemFunction = "";
+        XdmfString functionName = (XdmfString) lXdmfDOM->GetAttribute(attributeDINode, "Function");
+        if (!functionName) {
+          XdmfErrorMessage("No function defined for attribute " << attributeName);
+        }
+
+        XdmfXmlNode subDataItemNode = lXdmfDOM->FindElement("DataItem", 0, attributeDINode);
+        XdmfInt32 numberOfSubDataItems = lXdmfDOM->FindNumberOfElements("DataItem", attributeDINode);
+        XdmfDebug("Function DataItem has " << numberOfSubDataItems << " SubDataItems");
+        std::string dataItemCData;
+
+        XdmfConstString subDataItemHDFPath = lXdmfDOM->GetCData(subDataItemNode);
+        XdmfXmlNode hdfSubDataItemNode = this->FindConvertHDFPath(hdfDOM, subDataItemHDFPath);
+        XdmfXmlNode subDataItemHDFDataspaceNode = hdfDOM->FindElement("Dataspace", 0, hdfSubDataItemNode);
+        if (!subDataItemHDFDataspaceNode) {
+          XdmfErrorMessage("No Dataspace element found");
+          return NULL;
+        }
+        // Suppose we only have one dimensional arrays here
+        XdmfString subDataItemDimSize = (XdmfString) hdfDOM->GetAttribute(hdfDOM->GetChild(0, hdfDOM->GetChild(0, subDataItemHDFDataspaceNode)), "DimSize");
+        XdmfByte subDataItemDims[16];
+        sprintf(subDataItemDims, "%d %s", numberOfSubDataItems, subDataItemDimSize);
+        if (subDataItemDimSize) free(subDataItemDimSize);
+
+        while (subDataItemNode != NULL) {
+          // Get Item info
+          subDataItemHDFPath = lXdmfDOM->GetCData(subDataItemNode);
+          hdfSubDataItemNode = this->FindConvertHDFPath(hdfDOM, subDataItemHDFPath);
+          XdmfConstString subDataItemData = this->FindDataItemInfo(hdfDOM, hdfSubDataItemNode, hdfFileName, subDataItemHDFPath, lXdmfDOM, subDataItemNode);
+          if (subDataItemData) {
+            dataItemCData += subDataItemData;
+            delete []subDataItemData;
+          }
+          subDataItemNode = subDataItemNode->next;
+        }
+
+        std::string dataItem =
+            std::string("<DataItem ") +
+            "Dimensions=\"" + std::string(subDataItemDims) + "\" " +
+            "Function=\"" + std::string(functionName) + "\" " +
+            "ItemType=\"Function\">" +
+            dataItemCData +
+            "</DataItem>";
+
+        free(functionName);
+
+        attribute->SetDataXml(dataItem.c_str());
+      } else {
+        attributePath = lXdmfDOM->GetCData(attributeDINode);
+        hdfAttributeNode = this->FindConvertHDFPath(hdfDOM, attributePath);
+
+        if (!hdfAttributeNode) {
+          // The node does not exist in the HDF DOM so do not generate it
+          XdmfDebug("Skipping node of path " << attributePath);
+          continue;
+        }
+
+        // Use data item path a create a name if there is only a single data item in the attribute
+        if (!attributeName) {
+          vtksys::RegularExpression reName("/([^/]*)$");
+          reName.find(attributePath);
+          std::string tmpName = std::string("attribute_") + reName.match(1).c_str();
+          XdmfDebug("Attribute name: " << tmpName.c_str());
+          attribute->SetName(tmpName.c_str());
+        }
+
+        // Get Attribute info
+        attributeData = this->FindDataItemInfo(hdfDOM, hdfAttributeNode, hdfFileName, attributePath, lXdmfDOM, attributeDINode);
+        attribute->SetDataXml(attributeData);
+        if (attributeData) delete []attributeData;
       }
 
       // Set node center by default at the moment
       attribute->SetAttributeCenter(XDMF_ATTRIBUTE_CENTER_NODE);
-
-      // Get Attribute info
-      attributeData = this->FindDataItemInfo(hdfDOM, hdfAttributeNode, hdfFileName, attributePath, lXdmfDOM, attributeDINode);
-      attribute->SetDataXml(attributeData);
       attribute->SetAttributeType(this->FindAttributeType(hdfDOM, hdfAttributeNode, lXdmfDOM, attributeNode));
 
-      if (attributeData) delete []attributeData;
       grid->Insert(attribute);
       attribute->SetDeleteOnGridDelete(1);
     }
@@ -570,22 +628,58 @@ XdmfInt32 XdmfGenerator::FindAttributeType(XdmfHDFDOM *hdfDOM, XdmfXmlNode hdfDa
     return aType;
   }
 
-  // Otherwise, we can't be sure, but if only one dimentsion, it must be scalar
-  hdfDataspaceNode = hdfDOM->FindElement("Dataspace", 0, hdfDatasetNode);
-  nDimsStr = (XdmfString) hdfDOM->GetAttribute(hdfDOM->GetChild(0, hdfDataspaceNode), "Ndims");
-  nDims = atoi(nDimsStr);
-  if (nDimsStr) free(nDimsStr);
+  if (hdfDatasetNode) {
+    // Otherwise, we can't be sure, but if only one dimentsion, it must be scalar
+    hdfDataspaceNode = hdfDOM->FindElement("Dataspace", 0, hdfDatasetNode);
+    nDimsStr = (XdmfString) hdfDOM->GetAttribute(hdfDOM->GetChild(0, hdfDataspaceNode), "Ndims");
+    nDims = atoi(nDimsStr);
+    if (nDimsStr) free(nDimsStr);
 
-  // This is unreliable, if ndims==1 then scalar is correct, otherwise we are guessing.
-  switch (nDims) {
+    // This is unreliable, if ndims==1 then scalar is correct, otherwise we are guessing.
+    switch (nDims) {
     case 1:
       return XDMF_ATTRIBUTE_TYPE_SCALAR;
     case 2:
       return XDMF_ATTRIBUTE_TYPE_VECTOR;
     default:
       return XDMF_ATTRIBUTE_TYPE_NONE;
+    }
   }
   return XDMF_ATTRIBUTE_TYPE_NONE;
+}
+//----------------------------------------------------------------------------
+XdmfInt32 XdmfGenerator::FindDataItemType(XdmfDOM *lXdmfDOM, XdmfXmlNode dataItemNode)
+{
+  XdmfConstString dataItemType;
+
+  // if the template has defined the attribute type, use it
+  dataItemType = lXdmfDOM->GetAttribute(dataItemNode, "ItemType");
+  if (dataItemType) {
+    XdmfInt32 aType = XDMF_ITEM_UNIFORM;
+
+    if(XDMF_WORD_CMP(dataItemType, "Uniform")){
+      aType = XDMF_ITEM_UNIFORM;
+    }
+    else if(XDMF_WORD_CMP(dataItemType, "Collection")){
+      aType = XDMF_ITEM_COLLECTION;
+    }
+    else if(XDMF_WORD_CMP(dataItemType, "Tree")){
+      aType = XDMF_ITEM_TREE;
+    }
+    else if(XDMF_WORD_CMP(dataItemType, "HyperSlab")){
+      aType = XDMF_ITEM_HYPERSLAB;
+    }
+    else if(XDMF_WORD_CMP(dataItemType, "Coordinates")){
+      aType = XDMF_ITEM_COORDINATES;
+    }
+    else if(XDMF_WORD_CMP(dataItemType, "Function")){
+      aType = XDMF_ITEM_FUNCTION;
+    }
+
+    free((XdmfString)dataItemType);
+    return aType;
+  }
+  return XDMF_ITEM_UNIFORM;
 }
 //----------------------------------------------------------------------------
 

@@ -175,14 +175,12 @@
         <DataItem Name="y">/Step#0/Y</DataItem>
         <DataItem Name="z">/Step#0/Z</DataItem>
       </Geometry>
-      <Attribute>
-        <DataItem>/Step#0/VX</DataItem>
-      </Attribute>
-      <Attribute>
-        <DataItem>/Step#0/VY</DataItem>
-      </Attribute>
-      <Attribute>
-        <DataItem>/Step#0/VZ</DataItem>
+      <Attribute AttributeType="Vector" Name="Velocity">
+        <DataItem Function="JOIN($0, $1, $2)" ItemType="Function">
+          <DataItem >/Step#0/VX</DataItem>
+          <DataItem >/Step#0/VY</DataItem>
+          <DataItem >/Step#0/VZ</DataItem>
+        </DataItem>
       </Attribute>
       <Attribute>
         <DataItem>/Step#0/P</DataItem>
@@ -258,12 +256,3 @@
   </Domain>
 
 </Xdmf>
-<!-- 
-      <Attribute AttributeType="Vector" Name="Velocity">
-        <DataItem Function="JOIN($0, $1, $2)" ItemType="Function">
-          <DataItem >/Step#0/VX</DataItem>
-          <DataItem >/Step#0/VY</DataItem>
-          <DataItem >/Step#0/VZ</DataItem>
-        </DataItem>
-      </Attribute>
--->
