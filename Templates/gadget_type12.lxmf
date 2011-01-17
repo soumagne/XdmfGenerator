@@ -24,16 +24,16 @@
     </Documentation>
     </IntVectorProperty>
     
-    <IntVectorProperty name="Parameter3"
-      command="SetSteeringValueInt_@@@"
-      label="MAXITER"
+    <DoubleVectorProperty name="Parameter3"
+      command="SetSteeringValueDouble_@@@"
+      label="gravity"
       number_of_elements="1"
-      default_values="150">
-      <IntRangeDomain name="range" min="100" max="200"/>
+      default_values="6.672e-8">
+      <DoubleRangeDomain name="range" min="0" max="100.672e-8"/>
       <Documentation>
         steering scalar documentation for Parameter3
     </Documentation>
-    </IntVectorProperty>
+    </DoubleVectorProperty>
 
   </Interaction>
   <Domain>
