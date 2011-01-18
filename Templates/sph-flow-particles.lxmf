@@ -6,9 +6,10 @@
   <!-- ================================================================ -->
 
   <Interaction>
-  <!-- 
+    <!-- 
     Time range can be set by the simulation and read by the server
-  -->
+    this is usually done at startup before ay data has been sent
+    -->
     <DoubleVectorProperty
       name="TimeRange"
       command="SetSteeringValueDouble_@@@"
@@ -25,6 +26,30 @@
       <SimpleDoubleInformationHelper/>
     </DoubleVectorProperty>
 
+    <!-- 
+    Time can be set by the simulation and read by the server
+    this is usually done on every iteration at the same time as
+    sending new Data
+    -->
+    <DoubleVectorProperty
+      name="Time"
+      command="SetSteeringValueDouble_@@@"
+      number_of_elements="2"
+      default_values="0.0 0.0"
+      information_property="TimeInfo">
+      <DoubleRangeDomain name="range" />
+    </DoubleVectorProperty>
+
+    <DoubleVectorProperty
+      name="TimeInfo"
+      command="GetSteeringValueDouble_@@@"
+      information_only="1">
+      <SimpleDoubleInformationHelper/>
+    </DoubleVectorProperty>
+
+    <!-- 
+    A steering parameter to be controlled by the GUI
+    -->
     <DoubleVectorProperty
       name="InletVelocity"
       command="SetSteeringValueDouble_@@@"
