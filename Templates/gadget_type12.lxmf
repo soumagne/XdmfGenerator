@@ -2,6 +2,13 @@
 <Xdmf>
   <Interaction>
   
+    <DoubleVectorProperty
+      name="TimeInfo"
+      command="GetSteeringValueDouble_@@@"
+      information_only="1">
+      <SimpleDoubleInformationHelper/>
+    </DoubleVectorProperty>
+  
     <IntVectorProperty name="Parameter1"
       command="SetSteeringValueInt_@@@"
       label="Use Double Precision"
@@ -34,7 +41,18 @@
         steering scalar documentation for Parameter3
     </Documentation>
     </DoubleVectorProperty>
-
+    <!--
+   <DataSetProperty
+    name="ModifiedParticles"
+    label="Updated positions of particles after user interaction" >
+    <DataSetDomain grid="PartType1" type="Geometry">
+      <DataItem>/PartType1/Coordinates</DataItem>
+    </DataSetDomain>
+    <Documentation>
+      data set property documentation
+    </Documentation>
+  </DataSetProperty>
+  -->
   </Interaction>
   <Domain>
     <Grid Name="PartType1">
