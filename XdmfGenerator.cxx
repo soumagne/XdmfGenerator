@@ -347,7 +347,7 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
         XdmfXmlNode subDataItemHDFDataspaceNode = hdfDOM->FindElement("Dataspace", 0, hdfSubDataItemNode);
         if (!subDataItemHDFDataspaceNode) {
           XdmfErrorMessage("No Dataspace element found");
-          return NULL;
+          return(XDMF_FAIL);
         }
         // Suppose we only have one dimensional arrays here
         XdmfString subDataItemDimSize = (XdmfString) hdfDOM->GetAttribute(hdfDOM->GetChild(0, hdfDOM->GetChild(0, subDataItemHDFDataspaceNode)), "DimSize");

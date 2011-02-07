@@ -1,18 +1,64 @@
 <?xml version="1.0" ?>
 <Xdmf>
 
-  <!-- ================================================================ -->
-  <!-- Interaction : These are user controlled objects/params           -->
-  <!-- ================================================================ -->
+  <!-- ########################################################################### -->
+  <!-- Interaction : These are user controlled objects/params                      -->
+  <!-- ########################################################################### -->
 
   <Interaction>
+    <!-- 
+    Commands that should be click once to send, will be CommandProperty, but
+    not quite working 
+    -->
+    <CommandProperty
+      name="Restart"
+      label="Restart the simulation"
+      command="ExecuteSteeringCommand">
+    </CommandProperty>
+
+    <CommandProperty
+      name="ReloadFreeBodyMesh"
+      label="Reload free body mesh"
+      command="ExecuteSteeringCommand">
+    </CommandProperty>
+
+    <IntVectorProperty
+      name="ModifiedBodyNodesType"
+      label="Body Nodes Array Type"
+      command="SetSteeringType"
+      number_of_elements="1"
+      default_values="1" >
+      <EnumerationDomain name="enum">
+        <Entry value="0" text="Points"/>
+        <Entry value="1" text="Connectivity"/>
+        <Entry value="2" text="Field Array"/>
+      </EnumerationDomain>
+    </IntVectorProperty>
+
+    <DataArrayProperty
+     name="ModifiedBodyNodes"
+     command="SetSteeringArray"
+     label="Modified Body Node data"
+     hdfpath="/Mesh_Nodes#1/NewXYZ"
+     number_of_elements="5"
+     element_types="0 0 2 0 2"
+     default_values="0 0 /Mesh_Nodes#1/NewXYZ 0 undefined"
+     >
+    </DataArrayProperty>
+    
+<!--
+     none_string="No Data Write"
+     data_component="Geometry"
+     hdfpath="/Mesh_Nodes#1/NewXYZ"
+-->
+    
     <!-- 
     Time range can be set by the simulation and read by the server
     this is usually done at startup before ay data has been sent
     -->
     <DoubleVectorProperty
       name="TimeRange"
-      command="SetSteeringValueDouble_@@@"
+      command="SetSteeringValueDouble"
       number_of_elements="2"
       default_values="0.0 100.0"
       information_property="TimeRangeInfo">
@@ -21,7 +67,7 @@
 
     <DoubleVectorProperty 
       name="TimeRangeInfo"
-      command="GetSteeringValueDouble_@@@"
+      command="GetSteeringValueDouble"
       information_only="1">
       <SimpleDoubleInformationHelper/>
     </DoubleVectorProperty>
@@ -33,7 +79,7 @@
     -->
     <DoubleVectorProperty
       name="Time"
-      command="SetSteeringValueDouble_@@@"
+      command="SetSteeringValueDouble"
       number_of_elements="2"
       default_values="0.0 0.0"
       information_property="TimeInfo">
@@ -42,7 +88,7 @@
 
     <DoubleVectorProperty
       name="TimeInfo"
-      command="GetSteeringValueDouble_@@@"
+      command="GetSteeringValueDouble"
       information_only="1">
       <SimpleDoubleInformationHelper/>
     </DoubleVectorProperty>
@@ -52,19 +98,19 @@
     -->
     <DoubleVectorProperty
       name="InletVelocity"
-      command="SetSteeringValueDouble_@@@"
-      label="Inlet Fluid Velocity"
-      number_of_elements="3"
-      default_values="1.0 0.0 0.0">
-      <DoubleRangeDomain name="range" min="-5.0 -0.5 -0.5" max="5.0 0.5 0.5"/>
+      command="SetSteeringValueDouble"
+      label="Inlet Fluid X Velocity"
+      number_of_elements="1"
+      default_values="1.0" >
+      <DoubleRangeDomain name="range" min="-5.0" max="5.0"/>
       <Documentation>
-        Set the velocity of the input flow (don't exceed Speed of sound/3)
+        Set the X velocity of the input flow (don't exceed Speed of sound/3)
       </Documentation>
     </DoubleVectorProperty>
 
     <IntVectorProperty
       name="NeighbourSearch"
-      command="SetSteeringValueInt_@@@"
+      command="SetSteeringValueInt"
       label="Maximum Neighbour Count"
       number_of_elements="1"
       default_values="128">
@@ -76,7 +122,7 @@
 
     <IntVectorProperty
       name="Kernel"
-      command="SetSteeringValueInt_@@@"
+      command="SetSteeringValueInt"
       label="Kernel Type"
       number_of_elements="1"
       default_values="1">
@@ -92,7 +138,7 @@
 
     <IntVectorProperty
       name="ComputeMarchineCubes"
-      command="SetSteeringValueInt_@@@"
+      command="SetSteeringValueInt"
       label="Compute Marching Cubes"
       number_of_elements="1"
       default_values="1" >
@@ -102,25 +148,12 @@
       </Documentation>
     </IntVectorProperty>
 
-    <DoubleVectorProperty
-      name="AppliedForce"
-      command="SetSteeringValueDouble_@@@"
-      label="Force applied to paddle"
-      number_of_elements="3"
-      units="N"
-      default_values="0.0 0.0 0.0" >
-      <Documentation>
-        When a GUI control is used to push against the paddle
-        the force is returned to the simulation
-      </Documentation>
-    </DoubleVectorProperty>
-
     <!-- ======================== -->
     <!-- Centre of Body           -->
     <!-- ======================== -->
     <DoubleVectorProperty
       name="FreeBodyCentre"
-      command="SetSteeringValueDouble_@@@"
+      command="SetSteeringValueDouble"
       label="Centre Of Free Body"
       number_of_elements="3"
       default_values="0 0 0" >
@@ -144,52 +177,13 @@
         Used to map the CoG of a dataset to a point widget
       </Documentation>
     </DoubleVectorProperty>
-
-    <DataSetProperty
-      name="Body"
-      label="User supplied forces for each point on boundary" >
-      <Hints>
-        <AssociatedGrid name="Body" />
-      </Hints>
-    </DataSetProperty>
-
-    <!--
-    <DataSetProperty
-    name="ModifiedParticles"
-    label="Updated positions of particles after user interaction" >
-    <GridDomain name="Particles"> </GridDomain>
-    <DataSetDomain>
-      <DataItem Name="x">/Step#0/X</DataItem>
-      <DataItem Name="y">/Step#0/Y</DataItem>
-      <DataItem Name="z">/Step#0/Z</DataItem>
-    </DataSetDomain>
-    <Documentation>
-      After an interaction with the geometry of the simulation
-      a new particle position list is available from the dataset
-      referenced.
-      The dataset referenced is the same one that was used to transmit
-      the particles to the steering GUI.
-    </Documentation>
-  </DataSetProperty>
-
-  <DataSetProperty
-    name="BoundaryForces"
-    label="User supplied forces for each point on boundary" >
-    <DataSetDomain>
-      <DataItem Name="x">/Generated/X</DataItem>
-      <DataItem Name="y">/Generated/Y</DataItem>
-      <DataItem Name="z">/Generated/Z</DataItem>
-    </DataSetDomain>
-    <Documentation>
-      Forces that are applied to boundary points are sent in this dataset.
-      This dataset does not corrspond to a dataset sent by the simulation
-      it references a new GUI generated dataset that did not exist previously.
-    </Documentation>
-  </DataSetProperty>
--->
-
+ 
   </Interaction>
 
+  <!-- ########################################################################### -->
+  <!-- Grids to visualize                                                          -->
+  <!-- ########################################################################### -->
+  
   <Domain>
 
     <Grid Name="Particles">
