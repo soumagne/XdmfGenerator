@@ -4,13 +4,13 @@
   
     <DoubleVectorProperty
       name="TimeInfo"
-      command="GetSteeringValueDouble_@@@"
+      command="GetSteeringValueDouble"
       information_only="1">
       <SimpleDoubleInformationHelper/>
     </DoubleVectorProperty>
   
     <IntVectorProperty name="Parameter1"
-      command="SetSteeringValueInt_@@@"
+      command="SetSteeringValueInt"
       label="Use Double Precision"
       number_of_elements="1"
       default_values="1">
@@ -21,7 +21,7 @@
     </IntVectorProperty>
     
     <IntVectorProperty name="Parameter2"
-      command="SetSteeringValueDouble_@@@"
+      command="SetSteeringValueDouble"
       label="KERNEL_COEFFS"
       number_of_elements="3"
       default_values="2 15 45">
@@ -32,7 +32,7 @@
     </IntVectorProperty>
     
     <DoubleVectorProperty name="Parameter3"
-      command="SetSteeringValueDouble_@@@"
+      command="SetSteeringValueDouble"
       label="gravity"
       number_of_elements="1"
       default_values="6.672e-8">
