@@ -10,10 +10,10 @@
         <DataItem Name="z">/segments/01/geometry/z</DataItem>
       </Geometry>
       <Attribute Name="Density" AttributeType="Scalar" >
-        <DataItem>/segments/01/scalar_01</DataItem>
+        <DataItem>/segments/01/Density</DataItem>
       </Attribute>
       <Attribute Name="Entropy" AttributeType="Scalar" >
-        <DataItem>/segments/01/scalar_02</DataItem>
+        <DataItem>/segments/01/Entropy</DataItem>
       </Attribute>
       <Attribute Name="Electron Fraction" AttributeType="Scalar" >
         <DataItem>/segments/01/scalar_03</DataItem>
@@ -25,10 +25,10 @@
         <DataItem>/segments/01/scalar_05</DataItem>
       </Attribute>
       <Attribute Name="Momentum" AttributeType="Vector" >
-        <DataItem>/segments/01/vector_01</DataItem>
+        <DataItem>/segments/01/Velocity</DataItem>
       </Attribute>
       <Attribute Name="Magnetic Field" AttributeType="Vector" >
-        <DataItem>/segments/01/vector_02</DataItem>
+        <DataItem>/segments/01/Magnetic Field</DataItem>
       </Attribute>
     </Grid>
 
@@ -42,10 +42,10 @@
         <DataItem Name="z">/segments/02/geometry/z</DataItem>
       </Geometry>
       <Attribute Name="Density" AttributeType="Scalar" >
-        <DataItem>/segments/02/scalar_01</DataItem>
+        <DataItem>/segments/02/Density</DataItem>
       </Attribute>
       <Attribute Name="Entropy" AttributeType="Scalar" >
-        <DataItem>/segments/02/scalar_02</DataItem>
+        <DataItem>/segments/02/Entropy</DataItem>
       </Attribute>
       <Attribute Name="Electron Fraction" AttributeType="Scalar" >
         <DataItem>/segments/02/scalar_03</DataItem>
@@ -57,10 +57,10 @@
         <DataItem>/segments/02/scalar_05</DataItem>
       </Attribute>
       <Attribute Name="Momentum" AttributeType="Vector" >
-        <DataItem>/segments/02/vector_01</DataItem>
+        <DataItem>/segments/02/Velocity</DataItem>
       </Attribute>
       <Attribute Name="Magnetic Field" AttributeType="Vector" >
-        <DataItem>/segments/02/vector_02</DataItem>
+        <DataItem>/segments/02/Magnetic Field</DataItem>
       </Attribute>
     </Grid>
 
@@ -72,10 +72,10 @@
         <DataItem Name="z">/segments/03/geometry/z</DataItem>
       </Geometry>
       <Attribute Name="Density" AttributeType="Scalar" >
-        <DataItem>/segments/03/scalar_01</DataItem>
+        <DataItem>/segments/03/Density</DataItem>
       </Attribute>
       <Attribute Name="Entropy" AttributeType="Scalar" >
-        <DataItem>/segments/03/scalar_02</DataItem>
+        <DataItem>/segments/03/Entropy</DataItem>
       </Attribute>
       <Attribute Name="Electron Fraction" AttributeType="Scalar" >
         <DataItem>/segments/03/scalar_03</DataItem>
@@ -87,10 +87,10 @@
         <DataItem>/segments/03/scalar_05</DataItem>
       </Attribute>
       <Attribute Name="Momentum" AttributeType="Vector" >
-        <DataItem>/segments/03/vector_01</DataItem>
+        <DataItem>/segments/03/Velocity</DataItem>
       </Attribute>
       <Attribute Name="Magnetic Field" AttributeType="Vector" >
-        <DataItem>/segments/03/vector_02</DataItem>
+        <DataItem>/segments/03/Magnetic Field</DataItem>
       </Attribute>
     </Grid>
 
@@ -102,10 +102,10 @@
         <DataItem Name="z">/segments/04/geometry/z</DataItem>
       </Geometry>
       <Attribute Name="Density" AttributeType="Scalar" >
-        <DataItem>/segments/04/scalar_01</DataItem>
+        <DataItem>/segments/04/Density</DataItem>
       </Attribute>
       <Attribute Name="Entropy" AttributeType="Scalar" >
-        <DataItem>/segments/04/scalar_02</DataItem>
+        <DataItem>/segments/04/Entropy</DataItem>
       </Attribute>
       <Attribute Name="Electron Fraction" AttributeType="Scalar" >
         <DataItem>/segments/04/scalar_03</DataItem>
@@ -117,10 +117,10 @@
         <DataItem>/segments/04/scalar_05</DataItem>
       </Attribute>
       <Attribute Name="Momentum" AttributeType="Vector" >
-        <DataItem>/segments/04/vector_01</DataItem>
+        <DataItem>/segments/04/Velocity</DataItem>
       </Attribute>
       <Attribute Name="Magnetic Field" AttributeType="Vector" >
-        <DataItem>/segments/04/vector_02</DataItem>
+        <DataItem>/segments/04/Magnetic Field</DataItem>
       </Attribute>
     </Grid>
 
@@ -132,10 +132,10 @@
         <DataItem Name="z">/segments/dov/geometry/z</DataItem>
       </Geometry>
       <Attribute Name="Density" AttributeType="Scalar" >
-        <DataItem>/segments/dov/scalar_01</DataItem>
+        <DataItem>/segments/dov/Density</DataItem>
       </Attribute>
       <Attribute Name="Entropy" AttributeType="Scalar" >
-        <DataItem>/segments/dov/scalar_02</DataItem>
+        <DataItem>/segments/dov/Entropy</DataItem>
       </Attribute>
       <Attribute Name="Electron Fraction" AttributeType="Scalar" >
         <DataItem>/segments/dov/scalar_03</DataItem>
@@ -147,10 +147,10 @@
         <DataItem>/segments/dov/scalar_05</DataItem>
       </Attribute>
       <Attribute Name="Momentum" AttributeType="Vector" >
-        <DataItem>/segments/dov/vector_01</DataItem>
+        <DataItem>/segments/dov/Velocity</DataItem>
       </Attribute>
       <Attribute Name="Magnetic Field" AttributeType="Vector" >
-        <DataItem>/segments/dov/vector_02</DataItem>
+        <DataItem>/segments/dov/Magnetic Field</DataItem>
       </Attribute>
     </Grid>
 
