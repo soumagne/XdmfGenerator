@@ -104,7 +104,7 @@ XdmfInt32 XdmfGenerator::GenerateTemporalCollection(XdmfConstString lXdmfFile,
   temporalGrid.Build();
 
   // default file type: output.0000.h5
-  fileFinder->SetPrefixRegEx("(.*)?");
+  fileFinder->SetPrefixRegEx("(.*[^0-9])");
   fileFinder->SetTimeRegEx("([0-9]+)");
   fileFinder->Scan(anHdfFile);
   // TODO use time values of files eventually

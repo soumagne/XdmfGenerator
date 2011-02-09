@@ -30,7 +30,7 @@
 FileSeriesFinder::FileSeriesFinder(vtkstd::string filenamepattern)
 {
     FileNamePattern  = filenamepattern;
-    PrefixRegEx      = "(.*)[^0-9]";
+    PrefixRegEx      = "(.*[^0-9])";
     TimeRegEx        = "([0-9]+)";
     BlockRegEx       = "([0-9]+)";
     BlockSubDirRegEx = "";
