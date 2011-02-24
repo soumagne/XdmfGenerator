@@ -80,15 +80,15 @@
     <DoubleVectorProperty
       name="Time"
       command="SetSteeringValueDouble"
-      number_of_elements="2"
-      default_values="0.0 0.0"
+      number_of_elements="1"
+      default_values="0.0"
       information_property="TimeInfo">
       <DoubleRangeDomain name="range" />
     </DoubleVectorProperty>
 
     <DoubleVectorProperty
       name="TimeInfo"
-      command="GetSteeringValueDouble"
+      command="GetSteeringScalarDouble"
       information_only="1">
       <SimpleDoubleInformationHelper/>
     </DoubleVectorProperty>

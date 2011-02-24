@@ -1,14 +1,29 @@
 <?xml version="1.0" ?>
 <Xdmf>
   <Interaction>
-  
+
+    <!--
+    Time can be set by the simulation and read by the server
+    this is usually done on every iteration at the same time as
+    sending new Data
+    -->
+    <DoubleVectorProperty
+      name="Time"
+      command="SetSteeringValueDouble"
+      number_of_elements="1"
+      default_values="0.0"
+      information_property="TimeInfo">
+      <DoubleRangeDomain name="range" />
+    </DoubleVectorProperty>
+
     <DoubleVectorProperty
       name="TimeInfo"
-      command="GetSteeringValueDouble"
+      command="GetSteeringScalarDouble"
       information_only="1">
       <SimpleDoubleInformationHelper/>
     </DoubleVectorProperty>
-  
+
+    <!--
     <IntVectorProperty name="Parameter1"
       command="SetSteeringValueInt"
       label="Use Double Precision"
@@ -30,16 +45,58 @@
         steering scalar documentation for Parameter2
     </Documentation>
     </IntVectorProperty>
+    -->
+
+    <IntVectorProperty name="maxngb"
+      command="SetSteeringValueInt"
+      label="Max steps for neighbor iter"
+      number_of_elements="1"
+      default_values="150">
+      <IntRangeDomain name="range" min="0" max="200"/>
+      <Documentation>
+        Maximum number of steps for SPH neighbour iteration
+      </Documentation>
+    </IntVectorProperty>
     
-    <DoubleVectorProperty name="Parameter3"
+    <DoubleVectorProperty name="gravity"
       command="SetSteeringValueDouble"
-      label="gravity"
+      label="Gravity"
       number_of_elements="1"
       default_values="6.672e-8">
       <DoubleRangeDomain name="range" min="0" max="100.672e-8"/>
       <Documentation>
-        steering scalar documentation for Parameter3
-    </Documentation>
+        Gravitational constant (in cgs units)
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <DoubleVectorProperty name="coeff1"
+      command="SetSteeringValueDouble"
+      label="Spline kernel coeff 1"
+      number_of_elements="1"
+      default_values="2.546479089470">
+      <Documentation>
+        Coefficients for SPH spline kernel and its derivative
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <DoubleVectorProperty name="coeff2"
+      command="SetSteeringValueDouble"
+      label="Spline kernel coeff 2"
+      number_of_elements="1"
+      default_values="15.278874536822">
+      <Documentation>
+        Coefficients for SPH spline kernel and its derivative
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <DoubleVectorProperty name="coeff3"
+      command="SetSteeringValueDouble"
+      label="Spline kernel coeff 3"
+      number_of_elements="1"
+      default_values="45.836623610466">
+      <Documentation>
+        Coefficients for SPH spline kernel and its derivative
+      </Documentation>
     </DoubleVectorProperty>
     <!--
    <DataSetProperty
