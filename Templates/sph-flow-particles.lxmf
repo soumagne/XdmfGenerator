@@ -22,31 +22,22 @@
       command="ExecuteSteeringCommand">
     </CommandProperty>
 
-    <IntVectorProperty
-      name="ModifiedBodyNodesType"
-      label="Body Nodes Array Type"
-      command="SetSteeringType"
-      number_of_elements="1"
-      default_values="1" >
-      <EnumerationDomain name="enum">
-        <Entry value="0" text="Points"/>
-        <Entry value="1" text="Connectivity"/>
-        <Entry value="2" text="Field Array"/>
-      </EnumerationDomain>
-    </IntVectorProperty>
-
-    <DataArrayProperty
-     name="ModifiedBodyNodes"
-     command="SetSteeringArray"
-     label="Modified Body Node data"
-     hdfpath="/Mesh_Nodes#1/NewXYZ"
-     number_of_elements="5"
-     element_types="0 0 2 0 2"
-     default_values="0 0 /Mesh_Nodes#1/NewXYZ 0 undefined"
-     >
-    </DataArrayProperty>
+    <DataExportProperty
+      name="ModifiedBodyNodes"
+      command="SetSteeringArray"
+      label="Modified Body Node Data">
+      <DataExportDomain name="data_export"
+        full_path="/Mesh_DataSet"
+        geometry_path="/Mesh_Nodes#1/NewXYZ"
+        topology_path="/Mesh_Nodes#1/NewConnectivity">
+      </DataExportDomain>
+    </DataExportProperty>
     
-<!--
+    <!--
+        field_path="/Fields/">
+        -->
+
+    <!--
      none_string="No Data Write"
      data_component="Geometry"
      hdfpath="/Mesh_Nodes#1/NewXYZ"
