@@ -32,7 +32,16 @@
         topology_path="/Mesh_Nodes#1/NewConnectivity">
       </DataExportDomain>
     </DataExportProperty>
-    
+
+    <IntVectorProperty
+      name="WaitForGui"
+      command="SetSteeringValueInt"
+      label="Wait for GUI accept"
+      number_of_elements="1"
+      default_values="1" >
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
     <!--
         field_path="/Fields/">
         -->
