@@ -290,7 +290,7 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
         case XDMF_3DSMESH      :  
         case XDMF_3DRECTMESH   :  
         case XDMF_3DCORECTMESH :  
-          topology->GetShapeDesc()->SetShape(numcells.size(), &numcells[0]);
+          topology->GetShapeDesc()->SetShape((XdmfInt32)numcells.size(), &numcells[0]);
           break;
         default :
           topology->GetShapeDesc()->SetShape(1, &numcells[0]);

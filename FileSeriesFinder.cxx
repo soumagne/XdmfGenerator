@@ -98,7 +98,7 @@ vtkstd::string FileSeriesFinder::GenerateNumericPattern(vtkstd::string match)
 {
   vtkstd::string result;
   vtkstd::stringstream t1;
-  int len = match.length();
+  size_t len = match.length();
   if (len>1 && match[0]=='0') {
     t1 << "%0" << len << "i";
     result = t1.str();
@@ -293,7 +293,7 @@ void FileSeriesFinder::Scan(const char *inputfile)
       Tstrings = glob.GetFiles();
       vtkstd::string regexpattern = GenerateGlobString(TimeIndex, regexmatches, true);
       FindGlobbedSegments(regexpattern, Tstrings, true);
-      NumberOfTimeSteps = Tstrings.size();
+      NumberOfTimeSteps = (int)Tstrings.size();
       //
 #ifdef VERBOSE_FINDER
       vtkstd::cout << "#######################################################" << "\n";
@@ -313,7 +313,7 @@ void FileSeriesFinder::Scan(const char *inputfile)
     }
     if (glob.FindFiles(globpattern)) {
       Bstrings = glob.GetFiles();
-      NumberOfBlocks = Bstrings.size();
+      NumberOfBlocks = (int)Bstrings.size();
       vtkstd::string regexpattern = GenerateGlobString(BlockIndex, regexmatches, true);
       if (BlockSubDirRegEx!="") {
         vtksys::SystemTools::ReplaceString(regexpattern,BlockSubDirRegEx.c_str(), ".*");
@@ -334,7 +334,7 @@ void FileSeriesFinder::Scan(const char *inputfile)
     vtkstd::string globpattern = GenerateGlobString(VarIndex, regexmatches, false);
     if (glob.FindFiles(globpattern)) {
       Vstrings = glob.GetFiles();
-      NumberOfVars = Vstrings.size();
+      NumberOfVars = (int)Vstrings.size();
       vtkstd::string regexpattern = GenerateGlobString(VarIndex, regexmatches, true);
       FindGlobbedSegments(regexpattern, Vstrings, false);
 #ifdef VERBOSE_FINDER

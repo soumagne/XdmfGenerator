@@ -44,10 +44,10 @@ int main(int argc, char *argv[])
   XdmfGenerator      *xdmfGenerator = new XdmfGenerator();
   const char         *lxdmfFileName = argv[1];
   const char         *hdfFileName = argv[2];
-  bool                isCollection = true;
+  int                 isCollection = 1;
 
   if (argc == 4) {
-    isCollection = (bool) atoi(argv[3]);
+    isCollection = atoi(argv[3]);
   }
 
   if (isCollection) {

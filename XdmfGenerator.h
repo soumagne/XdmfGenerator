@@ -36,7 +36,6 @@ class XdmfHDFDOM;
 class XdmfGrid;
 class H5FDdsmBuffer;
 
-#include <sstream>
 #include <string>
 
 class XDMF_EXPORT XdmfGenerator : public XdmfObject
