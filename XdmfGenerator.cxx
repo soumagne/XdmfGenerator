@@ -53,6 +53,7 @@
 XdmfGenerator::XdmfGenerator()
 {
   this->DsmBuffer = NULL;
+  this->GeneratedFile = NULL;
 
   // Set the generated DOM
   this->GeneratedRoot.SetDOM(&this->GeneratedDOM);
@@ -63,6 +64,8 @@ XdmfGenerator::XdmfGenerator()
 //----------------------------------------------------------------------------
 XdmfGenerator::~XdmfGenerator()
 {
+  if (this->GeneratedFile) free(this->GeneratedFile);
+  this->GeneratedFile = NULL;
 }
 //----------------------------------------------------------------------------
 XdmfDOM *XdmfGenerator::GetGeneratedDOM()
@@ -76,8 +79,11 @@ XdmfConstString XdmfGenerator::GetGeneratedFile()
   generatedFileStream << "<?xml version=\"1.0\" ?>" << endl
       << "<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>" << endl
       << this->GeneratedDOM.Serialize();
-  this->GeneratedFile = generatedFileStream.str();
-  return this->GeneratedFile.c_str();
+//  this->GeneratedFile = generatedFileStream.str();
+  if (this->GeneratedFile) free(this->GeneratedFile);
+  this->GeneratedFile = (XdmfString) malloc(generatedFileStream.str().size() + 1);
+  strcpy(this->GeneratedFile, generatedFileStream.str().c_str());
+  return (XdmfConstString)this->GeneratedFile;
 }
 //----------------------------------------------------------------------------
 void XdmfGenerator::SetDsmBuffer(H5FDdsmBuffer *dsmBuffer)
