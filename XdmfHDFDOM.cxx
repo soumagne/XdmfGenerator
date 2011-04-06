@@ -198,7 +198,7 @@ XdmfHDFDOM::__Parse(XdmfConstString inxml, XdmfXmlDoc *DocPtr)
     // Is  this XML or a File Name
     if (inxml[0] == '<') {
       // It's XML
-      pDoc = xmlReadMemory(inxml, strlen(inxml), NULL, NULL, parserOptions);
+      pDoc = xmlReadMemory(inxml, (int)strlen(inxml), NULL, NULL, parserOptions);
     } else {
       // It's a File Name
       this->SetInputFileName(inxml);

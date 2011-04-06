@@ -22,12 +22,18 @@
   Framework Programme (FP7/2007-2013) under grant agreement 225967 “NextMuSE”
 
 =========================================================================*/
+
+#include "XdmfDump.h"
+
+#ifdef USE_MPI
+#include "mpi.h"
+#endif
+
 #include "h5dump.h"
 
 #ifdef USE_H5FD_DSM
 #include "H5FDdsmBuffer.h"
 #endif
-#include "XdmfDump.h"
 
 //----------------------------------------------------------------------------
 XdmfDump::XdmfDump()
@@ -54,8 +60,14 @@ XdmfDump::Dump()
   int print_rank;
   std::ostringstream stream;
   H5dump(4, (const char**) argv, stream, this->DsmBuffer);
+#ifdef USE_MPI
   MPI_Comm_rank(MPI_COMM_WORLD, &print_rank);
-  if(print_rank == 0) std::cout << stream.str() << std::endl;
+  if(print_rank == 0) {
+#endif
+  std::cout << stream.str() << std::endl;
+#ifdef USE_MPI
+  }
+#endif
 }
 //----------------------------------------------------------------------------
 void
@@ -65,8 +77,14 @@ XdmfDump::DumpLight()
   int print_rank;
   std::ostringstream stream;
   H5dump(5, (const char**) argv, stream, this->DsmBuffer);
+#ifdef USE_MPI
   MPI_Comm_rank(MPI_COMM_WORLD, &print_rank);
-  if(print_rank == 0) std::cout << stream.str() << std::endl;
+  if(print_rank == 0) {
+#endif
+  std::cout << stream.str() << std::endl;
+#ifdef USE_MPI
+  }
+#endif
 }
 //----------------------------------------------------------------------------
 void
