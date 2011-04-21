@@ -29,7 +29,8 @@
       <DataExportDomain name="data_export"
         full_path="/Mesh_DataSet"
         geometry_path="/Mesh_Nodes#1/NewXYZ"
-        topology_path="/Mesh_Nodes#1/NewConnectivity">
+        topology_path="/Mesh_Nodes#1/NewConnectivity"
+        command_property="ReloadFreeBodyMesh">
       </DataExportDomain>
     </DataExportProperty>
 
