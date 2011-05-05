@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Project                 : XdmfGenerator
-  Module                  : FileSeriesFinder.cxx
+  Module                  : XdmfFileSeriesFinder.cxx
 
   Authors:
      John Biddiscombe     Jerome Soumagne
@@ -27,7 +27,7 @@
 //#define VERBOSE_FINDER
 
 //----------------------------------------------------------------------------
-FileSeriesFinder::FileSeriesFinder(vtkstd::string filenamepattern)
+XdmfFileSeriesFinder::XdmfFileSeriesFinder(vtkstd::string filenamepattern)
 {
     FileNamePattern  = filenamepattern;
     PrefixRegEx      = "(.*)[^0-9]";
@@ -39,7 +39,7 @@ FileSeriesFinder::FileSeriesFinder(vtkstd::string filenamepattern)
     ExtRegEx         = "(\\..*)";
 }
 //----------------------------------------------------------------------------
-FileSeriesFinder::FileSeriesFinder()
+XdmfFileSeriesFinder::XdmfFileSeriesFinder()
 {
     FileNamePattern  = "PREFIX TIME EXT";
     PrefixRegEx      = "(.*)[^0-9]";
@@ -51,7 +51,7 @@ FileSeriesFinder::FileSeriesFinder()
     ExtRegEx         = "(\\..*)";
 }
 //----------------------------------------------------------------------------
-void FileSeriesFinder::SetFileName(const char *filename)
+void XdmfFileSeriesFinder::SetFileName(const char *filename)
 {
   this->TimeIndex = 0;
   this->Tstrings.clear();
@@ -59,42 +59,42 @@ void FileSeriesFinder::SetFileName(const char *filename)
   this->NumberOfTimeSteps = 1;
 }
 //----------------------------------------------------------------------------
-void FileSeriesFinder::SetPrefixRegEx(const char *prefix_regex)
+void XdmfFileSeriesFinder::SetPrefixRegEx(const char *prefix_regex)
 {
   if (prefix_regex) PrefixRegEx = prefix_regex;
 }
 //----------------------------------------------------------------------------
-void FileSeriesFinder::SetTimeRegEx(const char *time_regex)
+void XdmfFileSeriesFinder::SetTimeRegEx(const char *time_regex)
 {
   if (time_regex) TimeRegEx = time_regex;
 }
 //----------------------------------------------------------------------------
-void FileSeriesFinder::SetBlockRegEx(const char *block_regex)
+void XdmfFileSeriesFinder::SetBlockRegEx(const char *block_regex)
 {
   if (block_regex) BlockRegEx = block_regex;
 }
 //----------------------------------------------------------------------------
-void FileSeriesFinder::SetBlockSubDirRegEx(const char *block_regex)
+void XdmfFileSeriesFinder::SetBlockSubDirRegEx(const char *block_regex)
 {
   if (block_regex) BlockSubDirRegEx = block_regex;
 }
 //----------------------------------------------------------------------------
-void FileSeriesFinder::SetVarRegEx(const char *var_regex)
+void XdmfFileSeriesFinder::SetVarRegEx(const char *var_regex)
 {
   if (var_regex) VarRegEx = var_regex;
 }
 //----------------------------------------------------------------------------
-void FileSeriesFinder::SetText0RegEx(const char *text0_regex)
+void XdmfFileSeriesFinder::SetText0RegEx(const char *text0_regex)
 {
   if (text0_regex) Text0RegEx = text0_regex;
 }
 //----------------------------------------------------------------------------
-void FileSeriesFinder::SetExtRegEx(const char *ext_regex)
+void XdmfFileSeriesFinder::SetExtRegEx(const char *ext_regex)
 {
   if (ext_regex) ExtRegEx = ext_regex;
 }
 //----------------------------------------------------------------------------
-vtkstd::string FileSeriesFinder::GenerateNumericPattern(vtkstd::string match)
+vtkstd::string XdmfFileSeriesFinder::GenerateNumericPattern(vtkstd::string match)
 {
   vtkstd::string result;
   vtkstd::stringstream t1;
@@ -109,7 +109,7 @@ vtkstd::string FileSeriesFinder::GenerateNumericPattern(vtkstd::string match)
   return result;
 }
 //----------------------------------------------------------------------------
-vtkstd::string FileSeriesFinder::GenerateGlobString(unsigned int index, stringlist &patterns, bool regexmode)
+vtkstd::string XdmfFileSeriesFinder::GenerateGlobString(unsigned int index, stringlist &patterns, bool regexmode)
 {
   vtkstd::string globpattern;
   for (unsigned int i=0; i<patterns.size(); i++) {
@@ -128,7 +128,7 @@ vtkstd::string FileSeriesFinder::GenerateGlobString(unsigned int index, stringli
   return globpattern;
 }
 //----------------------------------------------------------------------------
-void FileSeriesFinder::FindGlobbedSegments(vtkstd::string &pattern, stringlist &files, bool numeric)
+void XdmfFileSeriesFinder::FindGlobbedSegments(vtkstd::string &pattern, stringlist &files, bool numeric)
 {
   vtksys::RegularExpression re(pattern.c_str());
   for (stringlist::iterator it=files.begin(); it!=files.end(); ++it) {
@@ -159,12 +159,12 @@ void FileSeriesFinder::FindGlobbedSegments(vtkstd::string &pattern, stringlist &
   }
 }
 //----------------------------------------------------------------------------
-vtkstd::string FileSeriesFinder::GenerateFileName(int T)
+vtkstd::string XdmfFileSeriesFinder::GenerateFileName(int T)
 {
   return this->GenerateFileName(T,0,0);
 }
 //----------------------------------------------------------------------------
-vtkstd::string FileSeriesFinder::GenerateFileName(int T, int B, int V)
+vtkstd::string XdmfFileSeriesFinder::GenerateFileName(int T, int B, int V)
 {
   vtkstd::string result;
   for (unsigned int i=0; i<regexmatches.size(); i++) {
@@ -185,7 +185,7 @@ vtkstd::string FileSeriesFinder::GenerateFileName(int T, int B, int V)
   return result;
 }
 //----------------------------------------------------------------------------
-void FileSeriesFinder::Scan(const char *inputfile)
+void XdmfFileSeriesFinder::Scan(const char *inputfile)
 {
   //
   // initialize
@@ -349,7 +349,7 @@ void FileSeriesFinder::Scan(const char *inputfile)
   }
 }
 //----------------------------------------------------------------------------
-void FileSeriesFinder::TestFilenameGeneration()
+void XdmfFileSeriesFinder::TestFilenameGeneration()
 {
   //
   //
@@ -369,22 +369,22 @@ void FileSeriesFinder::TestFilenameGeneration()
   } while (++t<NumberOfTimeSteps);
 }
 //----------------------------------------------------------------------------
-int FileSeriesFinder::GetNumberOfTimeSteps()
+int XdmfFileSeriesFinder::GetNumberOfTimeSteps()
 {
   return NumberOfTimeSteps;
 }
 //----------------------------------------------------------------------------
-int FileSeriesFinder::GetNumberOfBlocks()
+int XdmfFileSeriesFinder::GetNumberOfBlocks()
 {
   return NumberOfBlocks;
 }
 //----------------------------------------------------------------------------
-int FileSeriesFinder::GetNumberOfVars()
+int XdmfFileSeriesFinder::GetNumberOfVars()
 {
   return NumberOfVars;
 }
 //----------------------------------------------------------------------------
-double FileSeriesFinder::GetTimeValue(int index)
+double XdmfFileSeriesFinder::GetTimeValue(int index)
 {
   if (index>=0 && index<this->NumberOfTimeSteps) {
     vtkstd::stringstream t;
@@ -396,7 +396,7 @@ double FileSeriesFinder::GetTimeValue(int index)
   return 0.0;
 }
 //----------------------------------------------------------------------------
-void FileSeriesFinder::GetTimeValues(vtkstd::vector<double> &values)
+void XdmfFileSeriesFinder::GetTimeValues(vtkstd::vector<double> &values)
 {
   values.clear();
   for (int i=0; i<this->NumberOfTimeSteps; i++) {
@@ -411,7 +411,7 @@ void FileSeriesFinder::GetTimeValues(vtkstd::vector<double> &values)
 int main_test(int argc, char **argv)
 {
 
-  FileSeriesFinder finder("PREFIX TIME EXT");
+  XdmfFileSeriesFinder finder("PREFIX TIME EXT");
   finder.Scan("D:/data/csf/CSF16transient-16000.dat");
   finder.TestFilenameGeneration();
   //

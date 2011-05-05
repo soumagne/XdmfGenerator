@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Project                 : XdmfGenerator
-  Module                  : FileSeriesFinder.h
+  Module                  : XdmfFileSeriesFinder.h
 
   Authors:
      John Biddiscombe     Jerome Soumagne
@@ -40,10 +40,10 @@
 typedef vtkstd::vector<vtkstd::string> stringlist;
 typedef vtkstd::pair< vtkstd::string, vtkstd::string > maptype;
 //
-class VTK_EXPORT FileSeriesFinder {
+class VTK_EXPORT XdmfFileSeriesFinder {
   public:
-    FileSeriesFinder(vtkstd::string filenamepattern);
-    FileSeriesFinder();
+    XdmfFileSeriesFinder(vtkstd::string filenamepattern);
+    XdmfFileSeriesFinder();
 
     //
     // If loading just one file and no scan is required, use this function

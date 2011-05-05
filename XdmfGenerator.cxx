@@ -96,12 +96,12 @@ XdmfInt32 XdmfGenerator::GenerateTemporalCollection(XdmfConstString lXdmfFile,
 {
   vtkstd::vector<double> timeStepValues;
   XdmfGrid temporalGrid;
-  FileSeriesFinder *fileFinder;
+  XdmfFileSeriesFinder *fileFinder;
 
   if (fileNamePattern) {
-    fileFinder = new FileSeriesFinder(fileNamePattern);
+    fileFinder = new XdmfFileSeriesFinder(fileNamePattern);
   } else {
-    fileFinder = new FileSeriesFinder();
+    fileFinder = new XdmfFileSeriesFinder();
   }
   temporalGrid.SetGridType(XDMF_GRID_COLLECTION);
   temporalGrid.SetCollectionType(XDMF_GRID_COLLECTION_TEMPORAL);
