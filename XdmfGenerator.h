@@ -52,6 +52,20 @@ public:
   // Set DSM Buffer
   void SetDsmBuffer(H5FDdsmBuffer* _arg);
 
+  // For certain uses (such as a specialzed XdmfReader), we can instruct the generator
+  // to always put the fill hdf5 path in the filename rather than the relative path
+  XdmfSetValueMacro(UseFullHDF5Path,XdmfBoolean);
+  XdmfGetValueMacro(UseFullHDF5Path,XdmfBoolean);
+
+  XdmfSetStringMacro(PrefixRegEx);
+  XdmfGetStringMacro(PrefixRegEx);
+
+  XdmfSetStringMacro(TimeRegEx);
+  XdmfGetStringMacro(TimeRegEx); 
+
+  XdmfSetStringMacro(ExtRegEx);
+  XdmfGetStringMacro(ExtRegEx); 
+
   // Generate an XDMF File from a template file and a list of HDF files
   // the list of HDF files is generated using a specified file and a pattern
   // corresponding to all the matching files contained in the same directory
@@ -93,6 +107,10 @@ protected:
   XdmfRoot            GeneratedRoot;
   XdmfDomain          GeneratedDomain;
   H5FDdsmBuffer      *DsmBuffer;
+  XdmfBoolean         UseFullHDF5Path;
+  XdmfString          PrefixRegEx;
+  XdmfString          TimeRegEx;
+  XdmfString          ExtRegEx;
 };
 
 #endif /* XDMFGENERATOR_H */

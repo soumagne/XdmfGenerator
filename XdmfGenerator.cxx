@@ -52,8 +52,16 @@
 //----------------------------------------------------------------------------
 XdmfGenerator::XdmfGenerator()
 {
-  this->DsmBuffer = NULL;
-  this->GeneratedFile = NULL;
+  this->DsmBuffer       = NULL;
+  this->GeneratedFile   = NULL;
+  this->PrefixRegEx     = NULL;
+  this->TimeRegEx       = NULL;
+  this->ExtRegEx        = NULL;
+  this->UseFullHDF5Path = 1;
+  // default file type: output.0000.h5
+  this->SetPrefixRegEx("(.*[^0-9])");
+  this->SetTimeRegEx("([0-9]+)");
+  this->SetExtRegEx(".h5");
 
   // Set the generated DOM
   this->GeneratedRoot.SetDOM(&this->GeneratedDOM);
@@ -109,9 +117,9 @@ XdmfInt32 XdmfGenerator::GenerateTemporalCollection(XdmfConstString lXdmfFile,
   // Build the temporal grid
   temporalGrid.Build();
 
-  // default file type: output.0000.h5
-  fileFinder->SetPrefixRegEx("(.*[^0-9])");
-  fileFinder->SetTimeRegEx("([0-9]+)");
+  fileFinder->SetPrefixRegEx(this->PrefixRegEx);
+  fileFinder->SetTimeRegEx(this->TimeRegEx);
+  fileFinder->SetExtRegEx(this->ExtRegEx);
   fileFinder->Scan(anHdfFile);
   // TODO use time values of files eventually
   fileFinder->GetTimeValues(timeStepValues);
@@ -599,7 +607,12 @@ XdmfConstString XdmfGenerator::FindDataItemInfo(XdmfHDFDOM *hdfDOM, XdmfXmlNode 
   std::string unixname = hdfFileName;
   std::replace(unixname.begin(), unixname.end(), '\\', '/');
   size_t found = unixname.find_last_of("/\\");
-  unixname = unixname.substr(found+1);
+  if (!this->UseFullHDF5Path) {
+    unixname = unixname.substr(found+1);
+  }
+  else {
+    unixname = "File:" + unixname;
+  }
 
   // TODO Instead of using a string, may replace this by using XdmfDataItem
   dataItem =
