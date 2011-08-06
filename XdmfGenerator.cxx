@@ -57,7 +57,7 @@ XdmfGenerator::XdmfGenerator()
   this->PrefixRegEx     = NULL;
   this->TimeRegEx       = NULL;
   this->ExtRegEx        = NULL;
-  this->UseFullHDF5Path = 1;
+  this->UseFullHDF5Path = XDMF_TRUE;
   // default file type: output.0000.h5
   this->SetPrefixRegEx("(.*[^0-9])");
   this->SetTimeRegEx("([0-9]+)");
@@ -601,7 +601,7 @@ XdmfConstString XdmfGenerator::FindDataItemInfo(XdmfHDFDOM *hdfDOM, XdmfXmlNode 
     }
   }
 
-  // 1) Never use windows stye slashes in hdf paths
+  // 1) Never use windows style slashes in hdf paths
   // 2) Only use the relative file name, drop the path 
   // otherwise as you can't copy hdf5 + xml files between locations
   std::string unixname = hdfFileName;
@@ -609,9 +609,10 @@ XdmfConstString XdmfGenerator::FindDataItemInfo(XdmfHDFDOM *hdfDOM, XdmfXmlNode 
   size_t found = unixname.find_last_of("/\\");
   if (!this->UseFullHDF5Path) {
     unixname = unixname.substr(found+1);
-  }
-  else {
-    unixname = "File:" + unixname;
+  } else {
+    if (!this->DsmBuffer) {
+      unixname = "File:" + unixname;
+    }
   }
 
   // TODO Instead of using a string, may replace this by using XdmfDataItem

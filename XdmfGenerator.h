@@ -52,10 +52,10 @@ public:
   // Set DSM Buffer
   void SetDsmBuffer(H5FDdsmBuffer* _arg);
 
-  // For certain uses (such as a specialzed XdmfReader), we can instruct the generator
-  // to always put the fill hdf5 path in the filename rather than the relative path
-  XdmfSetValueMacro(UseFullHDF5Path,XdmfBoolean);
-  XdmfGetValueMacro(UseFullHDF5Path,XdmfBoolean);
+  // For certain uses (such as a specialized XdmfReader), we can instruct the generator
+  // to always put the full hdf5 path in the filename rather than the relative path
+  XdmfSetValueMacro(UseFullHDF5Path, XdmfBoolean);
+  XdmfGetValueMacro(UseFullHDF5Path, XdmfBoolean);
 
   XdmfSetStringMacro(PrefixRegEx);
   XdmfGetStringMacro(PrefixRegEx);
