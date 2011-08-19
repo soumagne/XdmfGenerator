@@ -59,9 +59,9 @@ XdmfGenerator::XdmfGenerator()
   this->ExtRegEx        = NULL;
   this->UseFullHDF5Path = XDMF_TRUE;
   // default file type: output.0000.h5
-  this->SetPrefixRegEx("(.*[^0-9])");
+  this->SetPrefixRegEx("(.+).");
   this->SetTimeRegEx("([0-9]+)");
-  this->SetExtRegEx(".h5");
+  this->SetExtRegEx("([.]h5)");
 
   // Set the generated DOM
   this->GeneratedRoot.SetDOM(&this->GeneratedDOM);
@@ -124,11 +124,11 @@ XdmfInt32 XdmfGenerator::GenerateTemporalCollection(XdmfConstString lXdmfFile,
   // TODO use time values of files eventually
   fileFinder->GetTimeValues(timeStepValues);
 
-//  std::cerr << "Number of TimeSteps: " <<fileFinder->GetNumberOfTimeSteps() << std::endl;
+  // std::cerr << "Number of TimeSteps: " <<fileFinder->GetNumberOfTimeSteps() << std::endl;
   for (int i=0; i<fileFinder->GetNumberOfTimeSteps(); i++) {
-//    std::cerr << "Generate file name for time step: " << timeStepValues[i] << std::endl;
+    // std::cerr << "Generate file name for time step: " << timeStepValues[i] << std::endl;
     std::string currentHdfFile = fileFinder->GenerateFileName(i);
-//    std::cerr << "File name generated: " << currentHdfFile << std::endl;
+    // std::cerr << "File name generated: " << currentHdfFile << std::endl;
     this->Generate(lXdmfFile, currentHdfFile.c_str(), &temporalGrid, timeStepValues[i]);
   }
   delete fileFinder;
