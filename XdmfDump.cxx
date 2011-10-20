@@ -32,15 +32,14 @@
 #include "h5dump.h"
 
 #ifdef USE_H5FD_DSM
-#include "H5FDdsmBuffer.h"
-#include "H5FDdsmComm.h"
+#include "H5FDdsmManager.h"
 #endif
 
 //----------------------------------------------------------------------------
 XdmfDump::XdmfDump()
 {
-    this->DsmBuffer = NULL;
-    this->FileName = NULL;
+  this->DsmManager = NULL;
+  this->FileName = NULL;
 }
 //----------------------------------------------------------------------------
 XdmfDump::~XdmfDump()
@@ -49,21 +48,19 @@ XdmfDump::~XdmfDump()
 }
 //----------------------------------------------------------------------------
 void
-XdmfDump::SetDsmBuffer(H5FDdsmBuffer *dsmBuffer)
+XdmfDump::SetDsmManager(H5FDdsmManager *dsmBuffer)
 {
-  this->DsmBuffer = dsmBuffer;
+  this->DsmManager = dsmBuffer;
 }
 //----------------------------------------------------------------------------
 void
 XdmfDump::Dump()
 {
   const char *argv[4]={"./h5dump", "-f", "dsm", this->FileName};
-  int print_rank;
   std::ostringstream stream;
-  H5dump(4, (const char**) argv, stream, this->DsmBuffer);
+  H5dump(4, (const char**) argv, stream, this->DsmManager);
 #ifdef USE_MPI
-  MPI_Comm_rank(this->DsmBuffer->GetComm()->GetIntraComm(), &print_rank);
-  if(print_rank == 0) {
+  if(this->DsmManager->GetUpdatePiece() == 0) {
 #endif
   std::cout << stream.str() << std::endl;
 #ifdef USE_MPI
@@ -75,12 +72,10 @@ void
 XdmfDump::DumpLight()
 {
   const char *argv[5]={"./h5dump", "-f", "dsm", "-H", this->FileName};
-  int print_rank;
   std::ostringstream stream;
-  H5dump(5, (const char**) argv, stream, this->DsmBuffer);
+  H5dump(5, (const char**) argv, stream, this->DsmManager);
 #ifdef USE_MPI
-  MPI_Comm_rank(this->DsmBuffer->GetComm()->GetIntraComm(), &print_rank);
-  if(print_rank == 0) {
+  if(this->DsmManager->GetUpdatePiece() == 0) {
 #endif
   std::cout << stream.str() << std::endl;
 #ifdef USE_MPI
@@ -91,9 +86,9 @@ XdmfDump::DumpLight()
 void
 XdmfDump::DumpXML(std::ostringstream &stream)
 {
-  if (this->DsmBuffer) {
+  if (this->DsmManager) {
     const char *argv[8] = {"./h5dump", "-f", "dsm", "-x", "-X", ":", "-H", this->FileName};
-    H5dump(8, (const char**) argv, stream, this->DsmBuffer);
+    H5dump(8, (const char**) argv, stream, this->DsmManager);
   } else {
     const char *argv[6] = {"./h5dump", "-x", "-X", ":", "-H", this->FileName};
     H5dump(6, (const char**) argv, stream, NULL);

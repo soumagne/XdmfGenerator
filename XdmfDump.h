@@ -28,7 +28,7 @@
 #include "XdmfGeneratorconfig.h"
 #include "XdmfObject.h"
 
-class H5FDdsmBuffer;
+class H5FDdsmManager;
 
 #include <cstring>
 #include <sstream>
@@ -46,11 +46,11 @@ class XDMF_EXPORT XdmfDump : public XdmfObject {
         void DumpLight();
         void DumpXML(std::ostringstream &);
 
-        void SetDsmBuffer(H5FDdsmBuffer* _arg);
+        void SetDsmManager(H5FDdsmManager* _arg);
 
     protected:
-        H5FDdsmBuffer *DsmBuffer;
-        XdmfString     FileName;
+        H5FDdsmManager *DsmManager;
+        XdmfString      FileName;
 };
 
 #endif // __XdmfDump_h

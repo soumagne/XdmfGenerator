@@ -34,7 +34,7 @@
 
 class XdmfHDFDOM;
 class XdmfGrid;
-class H5FDdsmBuffer;
+class H5FDdsmManager;
 
 
 class XDMF_EXPORT XdmfGenerator : public XdmfObject
@@ -49,8 +49,8 @@ public:
   // Get generated XML string from generated DOM
   XdmfConstString  GetGeneratedFile();
 
-  // Set DSM Buffer
-  void SetDsmBuffer(H5FDdsmBuffer* _arg);
+  // Set DSM Manager
+  void SetDsmManager(H5FDdsmManager* _arg);
 
   // For certain uses (such as a specialized XdmfReader), we can instruct the generator
   // to always put the full hdf5 path in the filename rather than the relative path
@@ -106,7 +106,7 @@ protected:
   XdmfString          GeneratedFile;
   XdmfRoot            GeneratedRoot;
   XdmfDomain          GeneratedDomain;
-  H5FDdsmBuffer      *DsmBuffer;
+  H5FDdsmManager     *DsmManager;
   XdmfBoolean         UseFullHDF5Path;
   XdmfString          PrefixRegEx;
   XdmfString          TimeRegEx;

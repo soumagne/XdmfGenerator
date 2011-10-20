@@ -41,7 +41,7 @@
 #include "XdmfDataDesc.h"
 
 #ifdef USE_H5FD_DSM
-#include "H5FDdsmBuffer.h"
+#include "H5FDdsmManager.h"
 #endif
 #include "XdmfDump.h"
 
@@ -52,7 +52,7 @@
 //----------------------------------------------------------------------------
 XdmfGenerator::XdmfGenerator()
 {
-  this->DsmBuffer       = NULL;
+  this->DsmManager       = NULL;
   this->GeneratedFile   = NULL;
   this->PrefixRegEx     = NULL;
   this->TimeRegEx       = NULL;
@@ -94,9 +94,9 @@ XdmfConstString XdmfGenerator::GetGeneratedFile()
   return (XdmfConstString)this->GeneratedFile;
 }
 //----------------------------------------------------------------------------
-void XdmfGenerator::SetDsmBuffer(H5FDdsmBuffer *dsmBuffer)
+void XdmfGenerator::SetDsmManager(H5FDdsmManager *dsmManager)
 {
-    this->DsmBuffer = dsmBuffer;
+    this->DsmManager = dsmManager;
 }
 //----------------------------------------------------------------------------
 XdmfInt32 XdmfGenerator::GenerateTemporalCollection(XdmfConstString lXdmfFile,
@@ -159,8 +159,8 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
 
   // Dump HDF file
   hdfFileDump->SetFileName(hdfFileName);
-  if (this->DsmBuffer) {
-    hdfFileDump->SetDsmBuffer(this->DsmBuffer);
+  if (this->DsmManager) {
+    hdfFileDump->SetDsmManager(this->DsmManager);
   }
   hdfFileDump->DumpXML(hdfFileDumpStream);
 
@@ -610,7 +610,7 @@ XdmfConstString XdmfGenerator::FindDataItemInfo(XdmfHDFDOM *hdfDOM, XdmfXmlNode 
   if (!this->UseFullHDF5Path) {
     unixname = unixname.substr(found+1);
   } else {
-    if (!this->DsmBuffer) {
+    if (!this->DsmManager) {
       unixname = "File:" + unixname;
     }
   }
