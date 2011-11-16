@@ -20,12 +20,12 @@ IF(NOT USE_H5FD_DSM)
 
   SET(XdmfGenerator_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5dump.cxx
-    ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools.cxx
-    ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools_str.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools_ref.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools_str.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools_type.c
     ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools_utils.cxx
-    ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools_ref.cxx
-    ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools_type.cxx
-    ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5trav.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5trav.c
   )
 ELSE(NOT USE_H5FD_DSM)
   SET(XdmfGenerator_SRCS "")

@@ -25,14 +25,11 @@
 
 #include "XdmfDump.h"
 
-#ifdef USE_MPI
-#include "mpi.h"
-#endif
-
 #include "h5dump.h"
 
 #ifdef USE_H5FD_DSM
 #include "H5FDdsmManager.h"
+#include "H5FDdsm.h"
 #endif
 
 //----------------------------------------------------------------------------
@@ -48,9 +45,9 @@ XdmfDump::~XdmfDump()
 }
 //----------------------------------------------------------------------------
 void
-XdmfDump::SetDsmManager(H5FDdsmManager *dsmBuffer)
+XdmfDump::SetDsmManager(H5FDdsmManager *dsmManager)
 {
-  this->DsmManager = dsmBuffer;
+  this->DsmManager = dsmManager;
 }
 //----------------------------------------------------------------------------
 void
@@ -58,12 +55,15 @@ XdmfDump::Dump()
 {
   const char *argv[4]={"./h5dump", "-f", "dsm", this->FileName};
   std::ostringstream stream;
-  H5dump(4, (const char**) argv, stream, this->DsmManager);
-#ifdef USE_MPI
+#ifdef USE_H5FD_DSM
+  H5FD_dsm_set_manager(this->DsmManager);
+#endif
+  H5dump(4, (const char**) argv, stream);
+#ifdef USE_H5FD_DSM
   if(this->DsmManager->GetUpdatePiece() == 0) {
 #endif
   std::cout << stream.str() << std::endl;
-#ifdef USE_MPI
+#ifdef USE_H5FD_DSM
   }
 #endif
 }
@@ -73,12 +73,15 @@ XdmfDump::DumpLight()
 {
   const char *argv[5]={"./h5dump", "-f", "dsm", "-H", this->FileName};
   std::ostringstream stream;
-  H5dump(5, (const char**) argv, stream, this->DsmManager);
-#ifdef USE_MPI
+#ifdef USE_H5FD_DSM
+  H5FD_dsm_set_manager(this->DsmManager);
+#endif
+  H5dump(5, (const char**) argv, stream);
+#ifdef USE_H5FD_DSM
   if(this->DsmManager->GetUpdatePiece() == 0) {
 #endif
   std::cout << stream.str() << std::endl;
-#ifdef USE_MPI
+#ifdef USE_H5FD_DSM
   }
 #endif
 }
@@ -88,10 +91,13 @@ XdmfDump::DumpXML(std::ostringstream &stream)
 {
   if (this->DsmManager) {
     const char *argv[8] = {"./h5dump", "-f", "dsm", "-x", "-X", ":", "-H", this->FileName};
-    H5dump(8, (const char**) argv, stream, this->DsmManager);
+#ifdef USE_H5FD_DSM
+    H5FD_dsm_set_manager(this->DsmManager);
+#endif
+    H5dump(8, (const char**) argv, stream);
   } else {
     const char *argv[6] = {"./h5dump", "-x", "-X", ":", "-H", this->FileName};
-    H5dump(6, (const char**) argv, stream, NULL);
+    H5dump(6, (const char**) argv, stream);
   }
 }
 //----------------------------------------------------------------------------
