@@ -23,6 +23,7 @@
 
 =========================================================================*/
 
+#include "XdmfGeneratorconfig.h"
 #include "XdmfDump.h"
 
 #include "h5dump.h"

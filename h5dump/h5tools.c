@@ -28,7 +28,10 @@
 #include "h5tools_ref.h"
 #include "h5tools_utils.h"
 #include "H5private.h"
+#include "XdmfGeneratorconfig.h"
+#ifdef USE_H5FD_DSM
 #include "H5FDdsm.h"
+#endif
 
 #define SANITY_CHECK
 

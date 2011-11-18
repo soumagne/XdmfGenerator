@@ -13,22 +13,7 @@ IF(NOT USE_H5FD_DSM)
   FIND_PACKAGE(ParaView REQUIRED)
   INCLUDE(${PARAVIEW_USE_FILE})
   INCLUDE(${ParaView_BINARY_DIR}/Utilities/Xdmf2/XDMFConfig.cmake)
-  IF(XDMF_BUILD_MPI)
-    SET(USE_MPI 1)
-  ENDIF(XDMF_BUILD_MPI)
   INCLUDE_DIRECTORIES(${XDMF_INCLUDE_DIRS} ${XDMF_MPI_INCLUDE_PATH} ${XDMF_LIBXML2_INCLUDE})
-
-  SET(XdmfGenerator_SRCS
-    ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5dump.cxx
-    ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools_ref.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools_str.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools_type.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools_utils.cxx
-    ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5trav.c
-  )
-ELSE(NOT USE_H5FD_DSM)
-  SET(XdmfGenerator_SRCS "")
 ENDIF(NOT USE_H5FD_DSM)
 
 INCLUDE_DIRECTORIES(
@@ -38,7 +23,13 @@ INCLUDE_DIRECTORIES(
   )
 
 SET(XdmfGenerator_SRCS
-  ${XdmfGenerator_SRCS}
+  ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5dump.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools_ref.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools_str.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools_type.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5tools_utils.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/h5dump/h5trav.c
   ${CMAKE_CURRENT_SOURCE_DIR}/XdmfGenerator.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/XdmfHDFDOM.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/FileSeriesFinder.cxx

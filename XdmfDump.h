@@ -25,7 +25,6 @@
 #ifndef __XdmfDump_h
 #define __XdmfDump_h
 
-#include "XdmfGeneratorconfig.h"
 #include "XdmfObject.h"
 
 class H5FDdsmManager;
