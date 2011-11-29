@@ -50,6 +50,10 @@ CONFIGURE_FILE(
   ${CMAKE_CURRENT_BINARY_DIR}/XdmfGeneratorconfig.h)
 
 ADD_LIBRARY(XdmfGenerator ${XdmfGenerator_LIBTYPE} ${XdmfGenerator_SRCS})
+set_target_properties(XdmfGenerator
+  PROPERTIES
+    COMPILE_FLAGS "-Dhdf5_tools_EXPORTS"
+)
 TARGET_LINK_LIBRARIES(XdmfGenerator Xdmf vtksys)
 
 ADD_EXECUTABLE(XdmfGenerate ${CMAKE_CURRENT_SOURCE_DIR}/XdmfGenerate.cxx)
