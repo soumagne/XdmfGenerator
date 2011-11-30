@@ -83,6 +83,7 @@ protected:
   // Convert written light XDMF Dataset path into HDF XML XPath and return
   // corresponding XML Node from the HDF DOM
   XdmfXmlNode      FindConvertHDFPath(XdmfHDFDOM *hdfDOM, XdmfConstString path);
+  std::string      ConvertHDFPath(XdmfHDFDOM *hdfDOM, XdmfConstString path);
 
   // Find the number of cells using the Topology Node
   // from HDF DOM and topology type
