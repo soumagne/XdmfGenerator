@@ -7,13 +7,13 @@
       <Geometry GeometryType="XYZ">
 	<DataItem>/PartType2/Coordinates</DataItem>
       </Geometry>
-      <Attribute>
+      <Attribute Name="Acceleration">
 	<DataItem>/PartType2/Acceleration</DataItem>
       </Attribute>
-      <Attribute>
+      <Attribute Name="Potential">
 	<DataItem>/PartType2/Potential</DataItem>
       </Attribute>
-      <Attribute>
+      <Attribute Name="Velocity">
 	<DataItem>/PartType2/Velocities</DataItem>
       </Attribute>
       <Time Value="0.5"/>
