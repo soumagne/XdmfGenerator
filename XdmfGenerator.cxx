@@ -49,6 +49,17 @@
 
 #include <cstdlib>
 #include <stack>
+//
+typedef struct attribNodeInfo {
+  XdmfXmlNode attribNode;
+  XdmfXmlNode attributeDINode;
+  std::string path;
+  std::string name;
+  int AttributeType;
+  //
+  attribNodeInfo(XdmfXmlNode t, XdmfXmlNode h, std::string p, std::string n, int a) :
+    attribNode(t), attributeDINode(h), path(p), name(n), AttributeType(a) {};
+} attribNodeInfo;
 //----------------------------------------------------------------------------
 XdmfGenerator::XdmfGenerator()
 {
@@ -329,16 +340,6 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
     // Look for Attributes
     //
     int numberOfAttributes = lXdmfDOM->FindNumberOfElements("Attribute", gridNode);
-    typedef struct attribNodeInfo {
-      XdmfXmlNode attribNode;
-      XdmfXmlNode attributeDINode;
-      std::string path;
-      std::string name;
-      int AttributeType;
-      //
-      attribNodeInfo(XdmfXmlNode t, XdmfXmlNode h, std::string p, std::string n, int a) :
-      attribNode(t), attributeDINode(h), path(p), name(n), AttributeType(a) {};
-    } attribNodeInfo;
 
 //    typedef std::pair<std::string, std::string> stringpair;
 //    typedef std::pair<XdmfXmlNode, XdmfXmlNode> nodepair;
