@@ -193,7 +193,6 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
   // to hold the multi-block structure
   //
   int numberOfGrids = lXdmfDOM->FindNumberOfElements("Grid", domainNode);
-  int numberOfGrids2 = lXdmfDOM->FindNumberOfElements("Grid", domainNode);
   if (numberOfGrids>1) {
     // Use a spatial grid collection to store the subgrids
     spatialGrid = new XdmfGrid();
@@ -359,7 +358,7 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
         XdmfConstString attribtype    = lXdmfDOM->GetAttribute(attributeNode, "AttributeType");
         XdmfConstString attributePath = lXdmfDOM->GetCData(attributeDINode);
         // for wildcards, find all the nodes in the HDF dump XML
-        if (STRCASECMP(attributeName, "*")==0) {
+        if (attributeName && STRCASECMP(attributeName, "*")==0) {
           std::string wildcard_search = this->ConvertHDFPath(hdfDOM, attributePath);
           XdmfXmlNode node = hdfDOM->FindElementByPath(wildcard_search.c_str());
           while (node) {          
@@ -374,8 +373,18 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
         }
         else {
           // add a non wildcard attribute
-          int atype = this->FindAttributeType(hdfDOM, NULL, lXdmfDOM, attributeNode);
-          attributes.push_back(attribNodeInfo(attributeNode,attributeDINode,attributePath,attributeName,atype));
+          XdmfXmlNode hdfAttributeNode = this->FindConvertHDFPath(hdfDOM, attributePath);
+          int atype = this->FindAttributeType(hdfDOM, hdfAttributeNode, lXdmfDOM, attributeNode);
+          // Use data item path a create a name if there is only a single data item in the attribute
+          if (!attributeName) {
+            vtksys::RegularExpression reName("/([^/]*)$");
+            reName.find(attributePath);
+            std::string tmpName = std::string("attribute_") + reName.match(1).c_str();
+            XdmfDebug("Attribute name: " << tmpName.c_str());
+            attributes.push_back(attribNodeInfo(attributeNode,attributeDINode,attributePath,tmpName.c_str(),atype));
+          } else {
+            attributes.push_back(attribNodeInfo(attributeNode,attributeDINode,attributePath,attributeName,atype));
+          }
         }
         if (attributeName) free((void*)attributeName);
         if (attribtype) free((void*)attribtype);
