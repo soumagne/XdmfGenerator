@@ -102,6 +102,7 @@ XdmfConstString XdmfGenerator::GetGeneratedFile()
   if (this->GeneratedFile) free(this->GeneratedFile);
   this->GeneratedFile = (XdmfString) malloc(generatedFileStream.str().size() + 1);
   strcpy(this->GeneratedFile, generatedFileStream.str().c_str());
+  std::cout <<  this->GeneratedFile << std::endl;
   return (XdmfConstString)this->GeneratedFile;
 }
 //----------------------------------------------------------------------------
@@ -339,6 +340,21 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
     // Look for Attributes
     //
     int numberOfAttributes = lXdmfDOM->FindNumberOfElements("Attribute", gridNode);
+    typedef struct attribNodeInfo {
+      XdmfXmlNode attribNode;
+      XdmfXmlNode attributeDINode;
+      std::string path;
+      std::string name;
+      int AttributeType;
+      std::string DataXML;
+      //
+      attribNodeInfo(XdmfXmlNode t, XdmfXmlNode h, const char *p, std::string n, int a) :
+      attribNode(t), attributeDINode(h), name(n), AttributeType(a) 
+      {
+        path = "";
+        if (p) path = p; 
+      };
+    } attribNodeInfo;
 
 //    typedef std::pair<std::string, std::string> stringpair;
 //    typedef std::pair<XdmfXmlNode, XdmfXmlNode> nodepair;
@@ -357,7 +373,9 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
         XdmfConstString attributeName = lXdmfDOM->GetAttribute(attributeNode, "Name");
         XdmfConstString attribtype    = lXdmfDOM->GetAttribute(attributeNode, "AttributeType");
         XdmfConstString attributePath = lXdmfDOM->GetCData(attributeDINode);
+        //
         // for wildcards, find all the nodes in the HDF dump XML
+        //
         if (attributeName && STRCASECMP(attributeName, "*")==0) {
           std::string wildcard_search = this->ConvertHDFPath(hdfDOM, attributePath);
           XdmfXmlNode node = hdfDOM->FindElementByPath(wildcard_search.c_str());
@@ -367,23 +385,76 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
             vtksys::SystemTools::ReplaceString(path,"*",name);
             int atype = this->FindAttributeType(hdfDOM, node, lXdmfDOM, attributeNode);
             // push a wildcard attribute (the node points to hdf xml, not template xml
-            attributes.push_back(attribNodeInfo(node,attributeDINode,path,name,atype));
+            attributes.push_back(attribNodeInfo(node,attributeDINode,path.c_str(),name,atype));
             node = node->next;
           }
         }
         else {
+          //
           // add a non wildcard attribute
-          XdmfXmlNode hdfAttributeNode = this->FindConvertHDFPath(hdfDOM, attributePath);
-          int atype = this->FindAttributeType(hdfDOM, hdfAttributeNode, lXdmfDOM, attributeNode);
-          // Use data item path a create a name if there is only a single data item in the attribute
-          if (!attributeName) {
-            vtksys::RegularExpression reName("/([^/]*)$");
-            reName.find(attributePath);
-            std::string tmpName = std::string("attribute_") + reName.match(1).c_str();
-            XdmfDebug("Attribute name: " << tmpName.c_str());
-            attributes.push_back(attribNodeInfo(attributeNode,attributeDINode,attributePath,tmpName.c_str(),atype));
-          } else {
-            attributes.push_back(attribNodeInfo(attributeNode,attributeDINode,attributePath,attributeName,atype));
+          //
+          // is this a function attribute
+          XdmfInt32 attributeDIType = this->FindDataItemType(lXdmfDOM, attributeDINode);
+          if (attributeDIType!=XDMF_ITEM_FUNCTION) {
+            XdmfXmlNode hdfAttributeNode = this->FindConvertHDFPath(hdfDOM, attributePath);
+            int atype = this->FindAttributeType(hdfDOM, hdfAttributeNode, lXdmfDOM, attributeNode);
+            if (!attributeName) {
+              std::string temp = vtksys::SystemTools::GetFilenameName(attributePath);
+              attributes.push_back(attribNodeInfo(attributeNode,attributeDINode,attributePath,temp,atype));
+            }
+            else {
+              attributes.push_back(attribNodeInfo(attributeNode,attributeDINode,attributePath,attributeName,atype));
+            }
+          }
+          else if (attributeDIType==XDMF_ITEM_FUNCTION) {
+            std::string dataItemFunction = "";
+            XdmfString functionName = (XdmfString) lXdmfDOM->GetAttribute(attributeDINode, "Function");
+            if (!functionName) {
+              XdmfErrorMessage("No function defined for attribute " << attributeName);
+            }
+
+            XdmfXmlNode subDataItemNode = lXdmfDOM->FindElement("DataItem", 0, attributeDINode);
+            XdmfInt32 numberOfSubDataItems = lXdmfDOM->FindNumberOfElements("DataItem", attributeDINode);
+            XdmfDebug("Function DataItem has " << numberOfSubDataItems << " SubDataItems");
+            std::string dataItemCData;
+
+            XdmfConstString subDataItemHDFPath = lXdmfDOM->GetCData(subDataItemNode);
+            XdmfXmlNode hdfSubDataItemNode = this->FindConvertHDFPath(hdfDOM, subDataItemHDFPath);
+            XdmfXmlNode subDataItemHDFDataspaceNode = hdfDOM->FindElement("Dataspace", 0, hdfSubDataItemNode);
+            if (!subDataItemHDFDataspaceNode) {
+              XdmfErrorMessage("No Dataspace element found");
+              return(XDMF_FAIL);
+            }
+            // Suppose we only have one dimensional arrays here
+            XdmfString subDataItemDimSize = (XdmfString) hdfDOM->GetAttribute(hdfDOM->GetChild(0, hdfDOM->GetChild(0, subDataItemHDFDataspaceNode)), "DimSize");
+            XdmfByte subDataItemDims[16];
+            sprintf(subDataItemDims, "%d %s", numberOfSubDataItems, subDataItemDimSize);
+            if (subDataItemDimSize) free(subDataItemDimSize);
+
+            while (subDataItemNode != NULL) {
+              // Get Item info
+              subDataItemHDFPath = lXdmfDOM->GetCData(subDataItemNode);
+              hdfSubDataItemNode = this->FindConvertHDFPath(hdfDOM, subDataItemHDFPath);
+              XdmfConstString subDataItemData = this->FindDataItemInfo(hdfDOM, hdfSubDataItemNode, hdfFileName, subDataItemHDFPath, lXdmfDOM, subDataItemNode);
+              if (subDataItemData) {
+                dataItemCData += subDataItemData;
+                delete []subDataItemData;
+              }
+              subDataItemNode = subDataItemNode->next;
+            }
+
+            std::string dataItem =
+                std::string("<DataItem ") +
+                "Dimensions=\"" + std::string(subDataItemDims) + "\" " +
+                "Function=\"" + std::string(functionName) + "\" " +
+                "ItemType=\"Function\">" +
+                dataItemCData +
+                "</DataItem>";
+
+            free(functionName);
+
+//        attribute->SetDataXml(dataItem.c_str());
+
           }
         }
         if (attributeName) free((void*)attributeName);
@@ -732,7 +803,7 @@ XdmfInt32 XdmfGenerator::FindAttributeType(XdmfHDFDOM *hdfDOM, XdmfXmlNode hdfDa
       return XDMF_ATTRIBUTE_TYPE_NONE;
     }
   }
-  return XDMF_ATTRIBUTE_TYPE_NONE;
+  return XDMF_ATTRIBUTE_TYPE_SCALAR; // XDMF_ATTRIBUTE_TYPE_NONE;
 }
 //----------------------------------------------------------------------------
 XdmfInt32 XdmfGenerator::FindDataItemType(XdmfDOM *lXdmfDOM, XdmfXmlNode dataItemNode)
