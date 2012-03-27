@@ -107,7 +107,7 @@ XdmfConstString XdmfGenerator::GetGeneratedFile()
   if (this->GeneratedFile) free(this->GeneratedFile);
   this->GeneratedFile = (XdmfString) malloc(generatedFileStream.str().size() + 1);
   strcpy(this->GeneratedFile, generatedFileStream.str().c_str());
-  std::cout <<  this->GeneratedFile << std::endl;
+//  std::cout <<  this->GeneratedFile << std::endl;
   return (XdmfConstString)this->GeneratedFile;
 }
 //----------------------------------------------------------------------------
