@@ -58,8 +58,8 @@ typedef struct attribNodeInfo {
   int AttributeType;
   std::string DataXML;
   //
-  attribNodeInfo(XdmfXmlNode t, XdmfXmlNode h, const char *p, std::string n, int a) :
-  attribNode(t), attributeDINode(h), name(n), AttributeType(a) 
+  attribNodeInfo(XdmfXmlNode t, XdmfXmlNode h, const char *p, std::string n, int a, const char *xml) :
+  attribNode(t), attributeDINode(h), name(n), AttributeType(a), DataXML(xml)
   {
     path = "";
     if (p) path = p; 
@@ -193,6 +193,12 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
 
   //Find domain element
   domainNode = lXdmfDOM->FindElement("Domain");
+  if (domainNode) {
+    std::cerr << "The XdmfGenerator has been changed and the <Domain> Tag should be removed from your template file" << std::endl;
+  }
+  else {
+    domainNode = lXdmfDOM->GetRoot();
+  }
 
   //
   // If the template has multiple grids, create a spatial grid 
@@ -255,6 +261,7 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
     // Look for Topology
     topology = grid->GetTopology();
     topologyTypeStr = (XdmfString) lXdmfDOM->GetAttribute(topologyNode, "TopologyType");
+    topologyTypeStr = topologyTypeStr ? topologyTypeStr : (XdmfString) lXdmfDOM->GetAttribute(topologyNode, "Type");
     topology->SetTopologyTypeFromString(topologyTypeStr);
     topologyDINode = lXdmfDOM->FindElement("DataItem", 0, topologyNode);
     if(topologyDINode != NULL) {
@@ -375,7 +382,7 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
             vtksys::SystemTools::ReplaceString(path,"*",name);
             int atype = this->FindAttributeType(hdfDOM, node, lXdmfDOM, attributeNode);
             // push a wildcard attribute (the node points to hdf xml, not template xml
-            attributes.push_back(attribNodeInfo(node,attributeDINode,path.c_str(),name,atype));
+            attributes.push_back(attribNodeInfo(node,attributeDINode,path.c_str(),name,atype,""));
             node = node->next;
           }
         }
@@ -390,10 +397,10 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
             int atype = this->FindAttributeType(hdfDOM, hdfAttributeNode, lXdmfDOM, attributeNode);
             if (!attributeName) {
               std::string temp = vtksys::SystemTools::GetFilenameName(attributePath);
-              attributes.push_back(attribNodeInfo(attributeNode,attributeDINode,attributePath,temp,atype));
+              attributes.push_back(attribNodeInfo(attributeNode,attributeDINode,attributePath,temp,atype, ""));
             }
             else {
-              attributes.push_back(attribNodeInfo(attributeNode,attributeDINode,attributePath,attributeName,atype));
+              attributes.push_back(attribNodeInfo(attributeNode,attributeDINode,attributePath,attributeName,atype, ""));
             }
           }
           else if (attributeDIType==XDMF_ITEM_FUNCTION) {
@@ -441,10 +448,8 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
                 dataItemCData +
                 "</DataItem>";
 
+            attributes.push_back(attribNodeInfo(attributeNode,attributeDINode,attributePath,attributeName,XDMF_ATTRIBUTE_TYPE_VECTOR,dataItem.c_str()));
             free(functionName);
-
-//        attribute->SetDataXml(dataItem.c_str());
-
           }
         }
         if (attributeName) free((void*)attributeName);
@@ -467,54 +472,7 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
       XdmfInt32 attributeDIType = this->FindDataItemType(lXdmfDOM, attributeDINode);
       // Check Data Item Type
       if (attributeDIType == XDMF_ITEM_FUNCTION) {
-
-        std::string dataItemFunction = "";
-        XdmfString functionName = (XdmfString) lXdmfDOM->GetAttribute(attributeDINode, "Function");
-        if (!functionName) {
-          XdmfErrorMessage("No function defined for attribute " << name.c_str());
-        }
-
-        XdmfXmlNode subDataItemNode = lXdmfDOM->FindElement("DataItem", 0, attributeDINode);
-        XdmfInt32 numberOfSubDataItems = lXdmfDOM->FindNumberOfElements("DataItem", attributeDINode);
-        XdmfDebug("Function DataItem has " << numberOfSubDataItems << " SubDataItems");
-        std::string dataItemCData;
-
-        XdmfConstString subDataItemHDFPath = lXdmfDOM->GetCData(subDataItemNode);
-        XdmfXmlNode hdfSubDataItemNode = this->FindConvertHDFPath(hdfDOM, subDataItemHDFPath);
-        XdmfXmlNode subDataItemHDFDataspaceNode = hdfDOM->FindElement("Dataspace", 0, hdfSubDataItemNode);
-        if (!subDataItemHDFDataspaceNode) {
-          XdmfErrorMessage("No Dataspace element found");
-          return(XDMF_FAIL);
-        }
-        // Suppose we only have one dimensional arrays here
-        XdmfString subDataItemDimSize = (XdmfString) hdfDOM->GetAttribute(hdfDOM->GetChild(0, hdfDOM->GetChild(0, subDataItemHDFDataspaceNode)), "DimSize");
-        XdmfByte subDataItemDims[16];
-        sprintf(subDataItemDims, "%d %s", numberOfSubDataItems, subDataItemDimSize);
-        if (subDataItemDimSize) free(subDataItemDimSize);
-
-        while (subDataItemNode != NULL) {
-          // Get Item info
-          subDataItemHDFPath = lXdmfDOM->GetCData(subDataItemNode);
-          hdfSubDataItemNode = this->FindConvertHDFPath(hdfDOM, subDataItemHDFPath);
-          XdmfConstString subDataItemData = this->FindDataItemInfo(hdfDOM, hdfSubDataItemNode, hdfFileName, subDataItemHDFPath, lXdmfDOM, subDataItemNode);
-          if (subDataItemData) {
-            dataItemCData += subDataItemData;
-            delete []subDataItemData;
-          }
-          subDataItemNode = subDataItemNode->next;
-        }
-
-        std::string dataItem =
-            std::string("<DataItem ") +
-            "Dimensions=\"" + std::string(subDataItemDims) + "\" " +
-            "Function=\"" + std::string(functionName) + "\" " +
-            "ItemType=\"Function\">" +
-            dataItemCData +
-            "</DataItem>";
-
-        free(functionName);
-
-        attribute->SetDataXml(dataItem.c_str());
+        attribute->SetDataXml((*it).DataXML.c_str());
       } 
       else {
         // for wildcard attributes we don't need to call this as the node is already found  

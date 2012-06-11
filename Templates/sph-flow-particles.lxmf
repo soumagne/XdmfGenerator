@@ -1,25 +1,140 @@
 <?xml version="1.0" ?>
-<Xdmf>
 
-  <!-- ########################################################################### -->
-  <!-- Interaction : These are user controlled objects/params                      -->
-  <!-- ########################################################################### -->
+<IcarusRoot>
 
+  <!--  ###########################################################################
+        Visualization : Objects whic are to be visualized by ParaView
+        ########################################################################### -->
+  <Visualization>
+
+    <!--  ########################################################################### 
+          Specify Particle data to be read using H5Part reader                        
+          H5Part will distribute particles evenly across processes                    
+          ########################################################################### -->
+
+    <H5Part Name="Particles">
+      <Step Name="Step"/>
+      <Xarray Name="X"/>
+      <Yarray Name="Y"/>
+      <Zarray Name="Z"/>
+    </H5Part>
+
+    <!--  ###########################################################################
+          Specify template for Xdmf reading of grids
+          Xdmf will place one grid on each process if used in parallel
+          ########################################################################### -->
+
+    <Xdmf>
+      <Grid Name="Tank">
+        <Topology TopologyType="Triangle" BaseOffset="1">
+          <DataItem Name="connectivity">/Mesh_Triangles#0/connectivity</DataItem>
+        </Topology>
+        <Geometry GeometryType="X_Y_Z">
+          <DataItem Name="x">/Mesh_Nodes#0/X</DataItem>
+          <DataItem Name="y">/Mesh_Nodes#0/Y</DataItem>
+          <DataItem Name="z">/Mesh_Nodes#0/Z</DataItem>
+        </Geometry>
+        <Attribute AttributeType="Vector" Name="Velocity">
+          <DataItem Function="JOIN($0, $1, $2)" ItemType="Function">
+            <DataItem >/Mesh_Nodes#0/VX</DataItem>
+            <DataItem >/Mesh_Nodes#0/VY</DataItem>
+            <DataItem >/Mesh_Nodes#0/VZ</DataItem>
+          </DataItem>
+        </Attribute>
+        <Attribute>
+          <DataItem>/Mesh_Nodes#0/P</DataItem>
+        </Attribute>
+      </Grid>
+
+      <Grid Name="Body">
+        <Topology TopologyType="Triangle" BaseOffset="1">
+          <DataItem Name="connectivity">/Mesh_Triangles#1/connectivity</DataItem>
+        </Topology>
+        <Geometry GeometryType="X_Y_Z">
+          <DataItem Name="x">/Mesh_Nodes#1/X</DataItem>
+          <DataItem Name="y">/Mesh_Nodes#1/Y</DataItem>
+          <DataItem Name="z">/Mesh_Nodes#1/Z</DataItem>
+        </Geometry>
+        <Attribute AttributeType="Vector" Name="Velocity">
+          <DataItem Function="JOIN($0, $1, $2)" ItemType="Function">
+            <DataItem >/Mesh_Nodes#1/VX</DataItem>
+            <DataItem >/Mesh_Nodes#1/VY</DataItem>
+            <DataItem >/Mesh_Nodes#1/VZ</DataItem>
+          </DataItem>
+        </Attribute>
+        <Attribute>
+          <Attribute AttributeType="Vector" Name="Velocity">
+            <DataItem Function="JOIN($0, $1, $2)" ItemType="Function">
+              <DataItem >/Mesh_Nodes#1/VX</DataItem>
+              <DataItem >/Mesh_Nodes#1/VY</DataItem>
+              <DataItem >/Mesh_Nodes#1/VZ</DataItem>
+            </DataItem>
+          </Attribute>
+          <DataItem>/Mesh_Nodes#1/P</DataItem>
+        </Attribute>
+      </Grid>
+
+      <Grid Name="Paddle">
+        <Topology TopologyType="Triangle" BaseOffset="1">
+          <DataItem Name="connectivity">/Mesh_Triangles#2/connectivity</DataItem>
+        </Topology>
+        <Geometry GeometryType="X_Y_Z">
+          <DataItem Name="x">/Mesh_Nodes#2/X</DataItem>
+          <DataItem Name="y">/Mesh_Nodes#2/Y</DataItem>
+          <DataItem Name="z">/Mesh_Nodes#2/Z</DataItem>
+        </Geometry>
+        <Attribute>
+          <DataItem>/Mesh_Nodes#2/VX</DataItem>
+        </Attribute>
+        <Attribute>
+          <DataItem>/Mesh_Nodes#2/VY</DataItem>
+        </Attribute>
+        <Attribute>
+          <DataItem>/Mesh_Nodes#2/VZ</DataItem>
+        </Attribute>
+        <Attribute>
+          <DataItem>/Mesh_Nodes#2/P</DataItem>
+        </Attribute>
+      </Grid>
+
+      <Grid Name="Marching Cubes">
+        <Topology TopologyType="Triangle" BaseOffset="1">
+          <DataItem Name="connectivity">/MC_Triangles#0/connectivity</DataItem>
+        </Topology>
+        <Geometry GeometryType="X_Y_Z">
+          <DataItem Name="x">/MC_Nodes/X</DataItem>
+          <DataItem Name="y">/MC_Nodes/Y</DataItem>
+          <DataItem Name="z">/MC_Nodes/Z</DataItem>
+        </Geometry>
+        <Attribute>
+          <DataItem>/MC_Nodes/V modulus</DataItem>
+        </Attribute>
+        <Attribute>
+          <DataItem>/MC_Nodes/P</DataItem>
+        </Attribute>
+      </Grid>
+
+    </Xdmf>
+
+  </Visualization>
+
+  <!--  ###########################################################################
+        Interaction : Objects which are to be controlled/modified
+        ########################################################################### -->
   <Interaction>
-    <!-- 
-    Commands that should be click once to send, will be CommandProperty, but
-    not quite working 
-    -->
+
     <CommandProperty
       name="Restart"
       label="Restart the simulation"
-      command="ExecuteSteeringCommand">
+      command="ExecuteSteeringCommand"
+      si_class="vtkSIProperty">
     </CommandProperty>
 
     <CommandProperty
       name="ReloadFreeBodyMesh"
       label="Reload free body mesh"
-      command="ExecuteSteeringCommand">
+      command="ExecuteSteeringCommand"
+      si_class="vtkSIProperty">
     </CommandProperty>
 
     <DataExportProperty
@@ -28,8 +143,8 @@
       label="Modified Body Node Data">
       <DataExportDomain name="data_export"
         full_path="/Mesh_DataSet"
-        geometry_path="/Mesh_Nodes#1/NewXYZ"
-        topology_path="/Mesh_Nodes#1/NewConnectivity"
+        geometry_path="/Mesh_Nodes#2/NewXYZ"
+        topology_path="/Mesh_Triangles#2/NewConnectivity"
         command_property="ReloadFreeBodyMesh">
       </DataExportDomain>
     </DataExportProperty>
@@ -43,20 +158,10 @@
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
-    <!--
-        field_path="/Fields/">
-        -->
+    <!-- An information_only property is only read by ParaView 
+       Time range can be set by the simulation and read by the server
+       this is usually done at startup before ay data has been sent    -->
 
-    <!--
-     none_string="No Data Write"
-     data_component="Geometry"
-     hdfpath="/Mesh_Nodes#1/NewXYZ"
--->
-    
-    <!-- 
-    Time range can be set by the simulation and read by the server
-    this is usually done at startup before ay data has been sent
-    -->
     <DoubleVectorProperty
       name="TimeRange"
       command="SetSteeringValueDouble"
@@ -66,18 +171,13 @@
       <DoubleRangeDomain name="range" />
     </DoubleVectorProperty>
 
-    <DoubleVectorProperty 
+    <DoubleVectorProperty
       name="TimeRangeInfo"
       command="GetSteeringValueDouble"
       information_only="1">
       <SimpleDoubleInformationHelper/>
     </DoubleVectorProperty>
 
-    <!-- 
-    Time can be set by the simulation and read by the server
-    this is usually done on every iteration at the same time as
-    sending new Data
-    -->
     <DoubleVectorProperty
       name="Time"
       command="SetSteeringValueDouble"
@@ -94,185 +194,54 @@
       <SimpleDoubleInformationHelper/>
     </DoubleVectorProperty>
 
-    <!-- 
-    A steering parameter to be controlled by the GUI
-    -->
     <DoubleVectorProperty
-      name="InletVelocity"
+      name="amplitude"
       command="SetSteeringValueDouble"
-      label="Inlet Fluid X Velocity"
+      label="Wave maker amplitude"
       number_of_elements="1"
-      default_values="1.0" >
-      <DoubleRangeDomain name="range" min="-5.0" max="5.0"/>
+      default_values="2.0" >
+      <DoubleRangeDomain name="range" min="0" max="2.0"/>
       <Documentation>
-        Set the X velocity of the input flow (don't exceed Speed of sound/3)
+        Set the amplitude of the wave maker
       </Documentation>
     </DoubleVectorProperty>
 
-    <IntVectorProperty
-      name="NeighbourSearch"
-      command="SetSteeringValueInt"
-      label="Maximum Neighbour Count"
-      number_of_elements="1"
-      default_values="128">
-      <IntRangeDomain name="range" min="32" max="256"/>
-      <Documentation>
-        Limit the number of neighbours searched and increase computation speed accordingly
-      </Documentation>
-    </IntVectorProperty>
-
-    <IntVectorProperty
-      name="Kernel"
-      command="SetSteeringValueInt"
-      label="Kernel Type"
-      number_of_elements="1"
-      default_values="1">
-      <EnumerationDomain name="enum">
-        <Entry value="0" text="Gaussian" />
-        <Entry value="1" text="Spline 3rd Order" />
-        <Entry value="2" text="Spline 5th Order" />
-      </EnumerationDomain>
-      <Documentation>
-        Specify the Kernel used
-      </Documentation>
-    </IntVectorProperty>
-
-    <IntVectorProperty
-      name="ComputeMarchineCubes"
-      command="SetSteeringValueInt"
-      label="Compute Marching Cubes"
-      number_of_elements="1"
-      default_values="1" >
-      <BooleanDomain name="bool"/>
-      <Documentation>
-        Turn on/off generation of Marching cubes data
-      </Documentation>
-    </IntVectorProperty>
-
-    <!-- ======================== -->
-    <!-- Centre of Body           -->
-    <!-- ======================== -->
     <DoubleVectorProperty
-      name="FreeBodyCentre"
+      name="Frequency"
       command="SetSteeringValueDouble"
-      label="Centre Of Free Body"
+      label="Wave maker frequency"
+      number_of_elements="1"
+      default_values="0.5" >
+      <DoubleRangeDomain name="range" min="0" max="5"/>
+      <Documentation>
+        Set the frequence of the wave maker
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <DoubleVectorProperty
+      name="Force"
+      command="SetSteeringValueDouble"
+      label="Force on the free body"
       number_of_elements="3"
-      default_values="0 0 0" >
-      <Hints>
-        <!-- Associate this property with a supplied grid -->
-        <AssociatedGrid name="Body" />
-        <!-- Manipulate this property with a point widget -->
-        <WidgetControl name="Box" />
-        <!-- Initialize the property using this algorithm -->
-        <Initialization name="BBoxCentre" />
-        <!-- Constrain the property change by the algorithm (units m/s) -->
-        <Constraint name="Motion">
-          <Parameter name="DeltaT" max="0.01"/>
-        </Constraint> />
-
-        <!-- Transform the property's associated grid using the following algorithm -->
-        <Finalization name="Transform" />
-      </Hints>
-
+      default_values="0.0 0.0 0.0">
       <Documentation>
-        Used to map the CoG of a dataset to a point widget
+        Set the force of the free body
       </Documentation>
     </DoubleVectorProperty>
- 
+
+    <DoubleVectorProperty
+      name="Momentum"
+      command="SetSteeringValueDouble"
+      label="Momentum on the free body"
+      number_of_elements="3"
+      default_values="0.0 0.0 0.0">
+      <Documentation>
+        Set the momentum of the free body
+      </Documentation>
+    </DoubleVectorProperty>
+
   </Interaction>
 
-  <!-- ########################################################################### -->
-  <!-- Grids to visualize                                                          -->
-  <!-- ########################################################################### -->
-  
-  <Domain>
+</IcarusRoot>
 
-    <Grid Name="Particles">
-      <Topology TopologyType="Polyvertex">
-      </Topology>
-      <Geometry GeometryType="X_Y_Z">
-        <DataItem Name="x">/Step#0/X</DataItem>
-        <DataItem Name="y">/Step#0/Y</DataItem>
-        <DataItem Name="z">/Step#0/Z</DataItem>
-      </Geometry>
-      <Attribute AttributeType="Vector" Name="Velocity">
-        <DataItem Function="JOIN($0, $1, $2)" ItemType="Function">
-          <DataItem >/Step#0/VX</DataItem>
-          <DataItem >/Step#0/VY</DataItem>
-          <DataItem >/Step#0/VZ</DataItem>
-        </DataItem>
-      </Attribute>
-      <Attribute>
-        <DataItem>/Step#0/P</DataItem>
-      </Attribute>
-      <Attribute>
-        <DataItem>/Step#0/Smooth</DataItem>
-      </Attribute>
-    </Grid>
 
-    <Grid Name="Marching Cubes">
-      <Topology TopologyType="Triangle" BaseOffset="1">
-        <DataItem Name="connectivity">/MC_Triangles#0/connectivity</DataItem>
-      </Topology>
-      <Geometry GeometryType="X_Y_Z">
-        <DataItem Name="x">/MC_Nodes/X</DataItem>
-        <DataItem Name="y">/MC_Nodes/Y</DataItem>
-        <DataItem Name="z">/MC_Nodes/Z</DataItem>
-      </Geometry>
-      <Attribute>
-        <DataItem>/MC_Nodes/V modulus</DataItem>
-      </Attribute>
-      <Attribute>
-        <DataItem>/MC_Nodes/P</DataItem>
-      </Attribute>
-      <Attribute>
-        <DataItem>/MC_Nodes/Smooth</DataItem>
-      </Attribute>
-    </Grid>
-
-    <Grid Name="Tank">
-      <Topology TopologyType="Triangle" BaseOffset="1">
-        <DataItem Name="connectivity">/Mesh_Triangles#0/connectivity</DataItem>
-      </Topology>
-      <Geometry GeometryType="X_Y_Z">
-        <DataItem Name="x">/Mesh_Nodes#0/X</DataItem>
-        <DataItem Name="y">/Mesh_Nodes#0/Y</DataItem>
-        <DataItem Name="z">/Mesh_Nodes#0/Z</DataItem>
-      </Geometry>
-      <Attribute>
-        <DataItem>/Mesh_Nodes#0/VX</DataItem>
-      </Attribute>
-      <Attribute>
-        <DataItem>/Mesh_Nodes#0/VY</DataItem>
-      </Attribute>
-      <Attribute>
-        <DataItem>/Mesh_Nodes#0/VZ</DataItem>
-      </Attribute>
-      <Attribute>
-        <DataItem>/Mesh_Nodes#0/P</DataItem>
-      </Attribute>
-      <Attribute>
-        <DataItem>/Mesh_Nodes#0/Smooth</DataItem>
-      </Attribute>
-    </Grid>
-
-    <Grid Name="Body">
-      <Topology TopologyType="Triangle" BaseOffset="1">
-        <DataItem Name="connectivity">/Mesh_Triangles#1/connectivity</DataItem>
-      </Topology>
-      <Geometry GeometryType="X_Y_Z">
-        <DataItem Name="x">/Mesh_Nodes#1/X</DataItem>
-        <DataItem Name="y">/Mesh_Nodes#1/Y</DataItem>
-        <DataItem Name="z">/Mesh_Nodes#1/Z</DataItem>
-      </Geometry>
-      <Attribute>
-        <DataItem>/Mesh_Nodes#1/P</DataItem>
-      </Attribute>
-      <Attribute>
-        <DataItem>/Mesh_Nodes#1/Smooth</DataItem>
-      </Attribute>
-    </Grid>
-
-  </Domain>
-
-</Xdmf>
