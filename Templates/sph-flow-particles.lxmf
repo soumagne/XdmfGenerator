@@ -3,7 +3,7 @@
 <IcarusRoot>
 
   <!--  ###########################################################################
-        Visualization : Objects whic are to be visualized by ParaView
+        Visualization : Objects which are to be visualized by ParaView
         ########################################################################### -->
   <Visualization>
 
