@@ -36,7 +36,6 @@ class XdmfHDFDOM;
 class XdmfGrid;
 class H5FDdsmManager;
 
-
 class XDMF_EXPORT XdmfGenerator : public XdmfObject
 {
 public:

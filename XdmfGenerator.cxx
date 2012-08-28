@@ -264,21 +264,32 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
     topologyTypeStr = topologyTypeStr ? topologyTypeStr : (XdmfString) lXdmfDOM->GetAttribute(topologyNode, "Type");
     topology->SetTopologyTypeFromString(topologyTypeStr);
     topologyDINode = lXdmfDOM->FindElement("DataItem", 0, topologyNode);
-    if(topologyDINode != NULL) {
-      XdmfConstString topologyPath = lXdmfDOM->GetCData(topologyDINode);
-      XdmfXmlNode hdfTopologyNode = this->FindConvertHDFPath(hdfDOM, topologyPath);
-      if (!hdfTopologyNode) {
-        XdmfDebug("Skipping node of path " << topologyPath);
-        continue;
+    if (topologyDINode != NULL) {
+      XdmfString format = (XdmfString) lXdmfDOM->GetAttribute(topologyDINode, "Format");
+      if (format && !xmlStrcmp((const xmlChar*)(format), BAD_CAST("XML"))) {
+        // copy XML data direct to output
+        free(format);
+        XdmfString topologyData = (XdmfString)lXdmfDOM->Serialize(topologyDINode);
+        topology->SetDataXml(topologyData);
+//        free(topologyData);
       }
-      XdmfConstString topologyData = this->FindDataItemInfo(hdfDOM, hdfTopologyNode, hdfFileName, topologyPath, lXdmfDOM, topologyDINode);
-      topology->SetNumberOfElements(this->FindNumberOfCells(hdfDOM, hdfTopologyNode, topologyTypeStr));
-      topology->SetDataXml(topologyData);
-      if (topologyData) delete []topologyData;
+      else {
+        XdmfConstString topologyPath = lXdmfDOM->GetCData(topologyDINode);
+        XdmfXmlNode hdfTopologyNode = this->FindConvertHDFPath(hdfDOM, topologyPath);
+        if (!hdfTopologyNode) {
+          XdmfDebug("Skipping node of path " << topologyPath);
+          continue;
+        }
+        XdmfConstString topologyData = this->FindDataItemInfo(hdfDOM, hdfTopologyNode, hdfFileName, topologyPath, lXdmfDOM, topologyDINode);
+        topology->SetNumberOfElements(this->FindNumberOfCells(hdfDOM, hdfTopologyNode, topologyTypeStr));
+        topology->SetDataXml(topologyData);
+        if (topologyData) delete []topologyData;
+      }
     }
     XdmfString topologyBaseOffset = (XdmfString) lXdmfDOM->GetAttribute(topologyNode, "BaseOffset");
     if (topologyBaseOffset) {
       topology->SetBaseOffset(atoi(topologyBaseOffset));
+      free(topologyBaseOffset);
     }
 
     // Look for Geometry
@@ -288,50 +299,60 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
     if (geometryTypeStr) free(geometryTypeStr);
     geometryDINode = lXdmfDOM->FindElement("DataItem", 0, geometryNode);
 
-    // we might need to read multiple items for x/y/z sizes (2-3 or more dimensions)
-    std::vector<XdmfInt64> numcells;
-    std::string geomXML = "<Geometry>";
-    while (!abortgrid && geometryDINode != NULL) {
-      XdmfConstString geometryPath = lXdmfDOM->GetCData(geometryDINode);
-      XdmfXmlNode hdfGeometryNode = this->FindConvertHDFPath(hdfDOM, geometryPath);
-      if (!hdfGeometryNode) {
-        XdmfDebug("Skipping node of path " << geometryPath);
-        // std::cerr << "Geometry Absent : Aborting Grid " << grid->GetName() << std::endl;
-        abortgrid = true;
+    XdmfString format = (XdmfString) lXdmfDOM->GetAttribute(geometryDINode, "Format");
+    if (format && !xmlStrcmp((const xmlChar*)(format), BAD_CAST("XML"))) {
+      // copy XML data direct to output
+      free(format);
+      XdmfString geometryData = (XdmfString)lXdmfDOM->Serialize(geometryDINode);
+      geometry->SetDataXml(geometryData);
+//        free(topologyData);
+    }
+    else {
+      // we might need to read multiple items for x/y/z sizes (2-3 or more dimensions)
+      std::vector<XdmfInt64> numcells;
+      std::string geomXML = "<Geometry>";
+      while (!abortgrid && geometryDINode != NULL) {
+        XdmfConstString geometryPath = lXdmfDOM->GetCData(geometryDINode);
+        XdmfXmlNode hdfGeometryNode = this->FindConvertHDFPath(hdfDOM, geometryPath);
+        if (!hdfGeometryNode) {
+          XdmfDebug("Skipping node of path " << geometryPath);
+          // std::cerr << "Geometry Absent : Aborting Grid " << grid->GetName() << std::endl;
+          abortgrid = true;
+          continue;
+        }
+        XdmfConstString geometryData = this->FindDataItemInfo(hdfDOM, hdfGeometryNode, hdfFileName, geometryPath, lXdmfDOM, geometryDINode);
+        if (geometryData) {
+          geomXML += geometryData;
+          delete []geometryData;
+        }
+        // Xdmf dimensions are in reverse order, so add each dimension to start of array, not end
+        XdmfInt64 N = this->FindNumberOfCells(hdfDOM, hdfGeometryNode, topologyTypeStr);
+        numcells.insert(numcells.begin(),N);
+        //
+        geometryDINode = geometryDINode->next;
+      }
+      if (abortgrid) {
         continue;
       }
-      XdmfConstString geometryData = this->FindDataItemInfo(hdfDOM, hdfGeometryNode, hdfFileName, geometryPath, lXdmfDOM, geometryDINode);
-      if (geometryData) {
-        geomXML += geometryData;
-        delete []geometryData;
-      }
-      // Xdmf dimensions are in reverse order, so add each dimension to start of array, not end
-      XdmfInt64 N = this->FindNumberOfCells(hdfDOM, hdfGeometryNode, topologyTypeStr);
-      numcells.insert(numcells.begin(),N);
+      geomXML += "</Geometry>";
+      geometry->SetDataXml(geomXML.c_str());
       //
-      geometryDINode = geometryDINode->next;
-    }
-    if (abortgrid) {
-      continue;
-    }
-    geomXML += "</Geometry>";
-    geometry->SetDataXml(geomXML.c_str());
-    //
-    // The geometry may be {x,y,z} separate arrays, but this does not mean the topology is rank 3
-    // for example particles, with x,y,z arrays are rank 1
-    //
-    if (topologyDINode == NULL) {
-      switch (topology->GetTopologyType()) {
-        case XDMF_2DSMESH      :  
-        case XDMF_2DRECTMESH   :
-        case XDMF_2DCORECTMESH :  
-        case XDMF_3DSMESH      :  
-        case XDMF_3DRECTMESH   :  
-        case XDMF_3DCORECTMESH :  
-          topology->GetShapeDesc()->SetShape((XdmfInt32)numcells.size(), &numcells[0]);
-          break;
-        default :
-          topology->GetShapeDesc()->SetShape(1, &numcells[0]);
+      // The geometry may be {x,y,z} separate arrays, but this does not mean the topology is rank 3
+      // for example particles, with x,y,z arrays are rank 1
+      //
+      if (topologyDINode == NULL) {
+        switch (topology->GetTopologyType()) {
+          case XDMF_2DSMESH      :  
+          case XDMF_2DRECTMESH   :
+          case XDMF_2DCORECTMESH :  
+          case XDMF_3DSMESH      :  
+          case XDMF_3DRECTMESH   :  
+          case XDMF_3DCORECTMESH :  
+            topology->GetShapeDesc()->SetShape((XdmfInt32)numcells.size(), &numcells[0]);
+            break;
+          default :
+            topology->GetShapeDesc()->SetShape(1, &numcells[0]);
+        }
       }
     }
     if (topologyTypeStr) free(topologyTypeStr);
