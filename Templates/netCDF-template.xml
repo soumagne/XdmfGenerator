@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 
-<IcarusRoot>
+<Icarus>
 
   <!--  ######################################################
         Visualization : Objects to be visualized by ParaView
@@ -23,6 +23,6 @@
   <Interaction>
   </Interaction>
 
-</IcarusRoot>
+</Icarus>
 
 
