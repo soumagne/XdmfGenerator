@@ -702,9 +702,10 @@ XdmfConstString XdmfGenerator::FindDataItemInfo(XdmfHDFDOM *hdfDOM, XdmfXmlNode 
 
   std::string diName = "";
   if (templateNode) {
-    XdmfConstString nodeName = lXdmfDOM->GetAttribute(templateNode, "Name");
+    XdmfString nodeName = (XdmfString) lXdmfDOM->GetAttribute(templateNode, "Name");
     if (nodeName) {
       diName = "Name=\"" + std::string(nodeName) + "\" ";
+      free(nodeName);
     }
   }
 
