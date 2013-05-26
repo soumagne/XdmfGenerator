@@ -119,7 +119,7 @@ void XdmfGenerator::SetDsmManager(H5FDdsmManager *dsmManager)
 XdmfInt32 XdmfGenerator::GenerateTemporalCollection(XdmfConstString lXdmfFile,
     XdmfConstString anHdfFile, XdmfConstString fileNamePattern)
 {
-  vtkstd::vector<double> timeStepValues;
+  std::vector<double> timeStepValues;
   XdmfGrid temporalGrid;
   XdmfFileSeriesFinder *fileFinder;
 
@@ -155,7 +155,7 @@ XdmfInt32 XdmfGenerator::GenerateTemporalCollection(XdmfConstString lXdmfFile,
 XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdfFileName,
     XdmfGrid *temporalGrid, XdmfInt32 timeValue)
 {
-  XdmfXmlNode         domainNode;
+  XdmfXmlNode         domainNode, visualizationNode, xdmfNode;
   XdmfDOM            *lXdmfDOM = new XdmfDOM();
   XdmfHDFDOM         *hdfDOM = new XdmfHDFDOM();
   XdmfDump           *hdfFileDump = new XdmfDump();
@@ -197,7 +197,14 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
     std::cerr << "The XdmfGenerator has been changed and the <Domain> Tag should be removed from your template file" << std::endl;
   }
   else {
-    domainNode = lXdmfDOM->GetRoot();
+    visualizationNode = lXdmfDOM->FindElement("Visualization");
+    xdmfNode = visualizationNode ? lXdmfDOM->FindElement("Xdmf", 0, visualizationNode) : NULL;
+    if (xdmfNode) {
+      domainNode = xdmfNode;
+    }
+    else {
+      domainNode = lXdmfDOM->GetRoot();
+    }
   }
 
   //
