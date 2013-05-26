@@ -26,10 +26,10 @@
 #define FILESERIESFINDER_H
 
 #include "XdmfGeneratorconfig.h"
-#include <vtkstd/string>
-#include <vtkstd/vector>
-#include <vtkstd/map>
-#include <vtkstd/algorithm>
+#include <string>
+#include <vector>
+#include <map>
+#include <algorithm>
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/Glob.hxx>
 #include <vtksys/RegularExpression.hxx>
@@ -37,12 +37,12 @@
 #include <sstream>
 #include "vtkSystemIncludes.h"
 
-typedef vtkstd::vector<vtkstd::string> stringlist;
-typedef vtkstd::pair< vtkstd::string, vtkstd::string > maptype;
+typedef std::vector<std::string> stringlist;
+typedef std::pair< std::string, std::string > maptype;
 //
 class VTK_EXPORT XdmfFileSeriesFinder {
   public:
-    XdmfFileSeriesFinder(vtkstd::string filenamepattern);
+    XdmfFileSeriesFinder(std::string filenamepattern);
     XdmfFileSeriesFinder();
 
     //
@@ -66,40 +66,40 @@ class VTK_EXPORT XdmfFileSeriesFinder {
     // print out all the files found
     void TestFilenameGeneration();
     // return the filename for a given time.block,var
-    vtkstd::string GenerateFileName(int T, int B, int V);
+    std::string GenerateFileName(int T, int B, int V);
     // assume block/var are zero and just use time
-    vtkstd::string GenerateFileName(int T);
+    std::string GenerateFileName(int T);
     //
     int GetNumberOfTimeSteps();
     int GetNumberOfBlocks();
     int GetNumberOfVars();
 
-    void GetTimeValues(vtkstd::vector<double> &values);
+    void GetTimeValues(std::vector<double> &values);
     double GetTimeValue(int index);
 
   protected:
-    vtkstd::string GenerateNumericPattern(vtkstd::string match);
-    vtkstd::string GenerateGlobString(unsigned int index, stringlist &patterns, bool regexmode);
-    void FindGlobbedSegments(vtkstd::string &pattern, stringlist &files, bool numeric);
+    std::string GenerateNumericPattern(std::string match);
+    std::string GenerateGlobString(unsigned int index, stringlist &patterns, bool regexmode);
+    void FindGlobbedSegments(std::string &pattern, stringlist &files, bool numeric);
 
 
   public:
-    vtkstd::string FileNamePattern; 
-    vtkstd::string PrefixRegEx;
-    vtkstd::string BlockRegEx;
-    vtkstd::string BlockSubDirRegEx;
-    vtkstd::string VarRegEx; 
-    vtkstd::string ExtRegEx;
-    vtkstd::string TimeRegEx;
-    vtkstd::string Text0RegEx;
+    std::string FileNamePattern; 
+    std::string PrefixRegEx;
+    std::string BlockRegEx;
+    std::string BlockSubDirRegEx;
+    std::string VarRegEx; 
+    std::string ExtRegEx;
+    std::string TimeRegEx;
+    std::string Text0RegEx;
     //
-    vtkstd::map<vtkstd::string, vtkstd::string> RegExMap;
+    std::map<std::string, std::string> RegExMap;
     stringlist patterns, regexmatches, Tstrings, Bstrings, Vstrings;
-    vtkstd::string regex;
+    std::string regex;
     int TimeIndex, NumberOfTimeSteps;
     int BlockIndex, NumberOfBlocks;
     int VarIndex, NumberOfVars;
-    vtkstd::string timeform, blockform, varform, filepattern;
+    std::string timeform, blockform, varform, filepattern;
 };
 
 #endif // FILESERIESFINDER_H

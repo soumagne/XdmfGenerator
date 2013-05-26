@@ -27,7 +27,7 @@
 //#define VERBOSE_FINDER
 
 //----------------------------------------------------------------------------
-XdmfFileSeriesFinder::XdmfFileSeriesFinder(vtkstd::string filenamepattern)
+XdmfFileSeriesFinder::XdmfFileSeriesFinder(std::string filenamepattern)
 {
     FileNamePattern  = filenamepattern;
     PrefixRegEx      = "(.*)[^0-9]";
@@ -94,10 +94,10 @@ void XdmfFileSeriesFinder::SetExtRegEx(const char *ext_regex)
   if (ext_regex) ExtRegEx = ext_regex;
 }
 //----------------------------------------------------------------------------
-vtkstd::string XdmfFileSeriesFinder::GenerateNumericPattern(vtkstd::string match)
+std::string XdmfFileSeriesFinder::GenerateNumericPattern(std::string match)
 {
-  vtkstd::string result;
-  vtkstd::stringstream t1;
+  std::string result;
+  std::stringstream t1;
   size_t len = match.length();
   if (len>1 && match[0]=='0') {
     t1 << "%0" << len << "i";
@@ -109,9 +109,9 @@ vtkstd::string XdmfFileSeriesFinder::GenerateNumericPattern(vtkstd::string match
   return result;
 }
 //----------------------------------------------------------------------------
-vtkstd::string XdmfFileSeriesFinder::GenerateGlobString(unsigned int index, stringlist &patterns, bool regexmode)
+std::string XdmfFileSeriesFinder::GenerateGlobString(unsigned int index, stringlist &patterns, bool regexmode)
 {
-  vtkstd::string globpattern;
+  std::string globpattern;
   for (unsigned int i=0; i<patterns.size(); i++) {
     if (i==index) {
       if (regexmode) {
@@ -128,19 +128,19 @@ vtkstd::string XdmfFileSeriesFinder::GenerateGlobString(unsigned int index, stri
   return globpattern;
 }
 //----------------------------------------------------------------------------
-void XdmfFileSeriesFinder::FindGlobbedSegments(vtkstd::string &pattern, stringlist &files, bool numeric)
+void XdmfFileSeriesFinder::FindGlobbedSegments(std::string &pattern, stringlist &files, bool numeric)
 {
   vtksys::RegularExpression re(pattern.c_str());
   for (stringlist::iterator it=files.begin(); it!=files.end(); ++it) {
     if (re.find(*it)) (*it) = re.match(1);
   }
   if (numeric) {
-    typedef vtkstd::pair<int,vtkstd::string> pairType;
-    typedef vtkstd::map< int, vtkstd::string > indexMap;
-    vtkstd::map< int, vtkstd::string > newlist;
+    typedef std::pair<int,std::string> pairType;
+    typedef std::map< int, std::string > indexMap;
+    std::map< int, std::string > newlist;
     for (stringlist::iterator it=files.begin(); it!=files.end(); ++it) {
       int num;
-      vtkstd::stringstream temp;
+      std::stringstream temp;
       temp << it->c_str();
       temp >> num;
       if (temp.eof()) {
@@ -155,18 +155,18 @@ void XdmfFileSeriesFinder::FindGlobbedSegments(vtkstd::string &pattern, stringli
     }
   }
   else {
-    vtkstd::sort(files.begin(), files.end());
+    std::sort(files.begin(), files.end());
   }
 }
 //----------------------------------------------------------------------------
-vtkstd::string XdmfFileSeriesFinder::GenerateFileName(int T)
+std::string XdmfFileSeriesFinder::GenerateFileName(int T)
 {
   return this->GenerateFileName(T,0,0);
 }
 //----------------------------------------------------------------------------
-vtkstd::string XdmfFileSeriesFinder::GenerateFileName(int T, int B, int V)
+std::string XdmfFileSeriesFinder::GenerateFileName(int T, int B, int V)
 {
-  vtkstd::string result;
+  std::string result;
   for (unsigned int i=0; i<regexmatches.size(); i++) {
     if      ((int)i==TimeIndex) result += Tstrings[T];
     else if ((int)i==BlockIndex) result += Bstrings[B];
@@ -175,7 +175,7 @@ vtkstd::string XdmfFileSeriesFinder::GenerateFileName(int T, int B, int V)
     else if (i==0 && BlockSubDirRegEx.size()>0) {
       result += regexmatches[i];
       vtksys::SystemTools::ReplaceString(result,BlockSubDirRegEx.c_str(), 
-        vtkstd::string("proc" + Bstrings[B]).c_str());
+        std::string("proc" + Bstrings[B]).c_str());
     }
     else result += regexmatches[i];
   }
@@ -200,7 +200,7 @@ void XdmfFileSeriesFinder::Scan(const char *inputfile)
   //
   //
   //
-  vtkstd::string cleaninput = inputfile;
+  std::string cleaninput = inputfile;
   vtksys::SystemTools::ConvertToUnixSlashes(cleaninput);
   //
   // find which parts of search pattern are present
@@ -218,22 +218,22 @@ void XdmfFileSeriesFinder::Scan(const char *inputfile)
   }
   //
 #ifdef VERBOSE_FINDER
-  vtkstd::cout << "File name search using Regular expression : " << regex.c_str() << "\n";;
+  std::cout << "File name search using Regular expression : " << regex.c_str() << "\n";;
 #endif
   //
   // Get the order of pattern parts right
   //
   stringlist::iterator pos;
-  if ((pos=vtkstd::find(patterns.begin(), patterns.end(), "TIME")) != patterns.end()) {
+  if ((pos=std::find(patterns.begin(), patterns.end(), "TIME")) != patterns.end()) {
     TimeIndex = pos-patterns.begin();
   }
-  if ((pos = vtkstd::find(patterns.begin(), patterns.end(), "BLOCK")) != patterns.end()) {
+  if ((pos = std::find(patterns.begin(), patterns.end(), "BLOCK")) != patterns.end()) {
     BlockIndex = pos-patterns.begin();
   }
-  if ((pos = vtkstd::find(patterns.begin(), patterns.end(), "VAR")) != patterns.end()) {
+  if ((pos = std::find(patterns.begin(), patterns.end(), "VAR")) != patterns.end()) {
     VarIndex = pos-patterns.begin();
   }
-  if ((pos = vtkstd::find(patterns.begin(), patterns.end(), "VAR")) != patterns.end()) {
+  if ((pos = std::find(patterns.begin(), patterns.end(), "VAR")) != patterns.end()) {
     VarIndex = pos-patterns.begin();
   }
 
@@ -245,7 +245,7 @@ void XdmfFileSeriesFinder::Scan(const char *inputfile)
   if (re1.find(cleaninput)) {
 #ifdef VERBOSE_FINDER
     for (unsigned int i=0; i<patterns.size(); i++) {
-      vtkstd::cout << patterns[i] << "=" << re1.match(i+1).c_str() << "  " << "\n";;
+      std::cout << patterns[i] << "=" << re1.match(i+1).c_str() << "  " << "\n";;
     }
 #endif
     //
@@ -278,7 +278,7 @@ void XdmfFileSeriesFinder::Scan(const char *inputfile)
       }
     }
 #ifdef VERBOSE_FINDER
-    vtkstd::cout << "Complete Pattern = " << filepattern.c_str() << "\n";;
+    std::cout << "Complete Pattern = " << filepattern.c_str() << "\n";;
 #endif
   }
   //
@@ -287,62 +287,62 @@ void XdmfFileSeriesFinder::Scan(const char *inputfile)
   vtksys::Glob glob;
   // Time 
   if (TimeIndex!=-1) {
-    vtkstd::string globpattern = GenerateGlobString(TimeIndex, regexmatches, false);
+    std::string globpattern = GenerateGlobString(TimeIndex, regexmatches, false);
     vtksys::SystemTools::ConvertToUnixSlashes(globpattern);
     if (glob.FindFiles(globpattern)) {
       Tstrings = glob.GetFiles();
-      vtkstd::string regexpattern = GenerateGlobString(TimeIndex, regexmatches, true);
+      std::string regexpattern = GenerateGlobString(TimeIndex, regexmatches, true);
       FindGlobbedSegments(regexpattern, Tstrings, true);
       NumberOfTimeSteps = (int)Tstrings.size();
       //
 #ifdef VERBOSE_FINDER
-      vtkstd::cout << "#######################################################" << "\n";
-      vtkstd::cout << "Found " << NumberOfTimeSteps << " Time files \n";
-      vtkstd::cout << "#######################################################" << "\n";
+      std::cout << "#######################################################" << "\n";
+      std::cout << "Found " << NumberOfTimeSteps << " Time files \n";
+      std::cout << "#######################################################" << "\n";
       for (stringlist::iterator it=Tstrings.begin(); it!=Tstrings.end(); ++it) {
-//          vtkstd::cout << (*it).c_str() << "\n";
+//          std::cout << (*it).c_str() << "\n";
       }
 #endif
     }
   }
   // Block
   if (BlockIndex!=-1) {
-    vtkstd::string globpattern = GenerateGlobString(BlockIndex, regexmatches, false);
+    std::string globpattern = GenerateGlobString(BlockIndex, regexmatches, false);
     if (BlockSubDirRegEx!="") {
       vtksys::SystemTools::ReplaceString(globpattern,BlockSubDirRegEx.c_str(), "*");
     }
     if (glob.FindFiles(globpattern)) {
       Bstrings = glob.GetFiles();
       NumberOfBlocks = (int)Bstrings.size();
-      vtkstd::string regexpattern = GenerateGlobString(BlockIndex, regexmatches, true);
+      std::string regexpattern = GenerateGlobString(BlockIndex, regexmatches, true);
       if (BlockSubDirRegEx!="") {
         vtksys::SystemTools::ReplaceString(regexpattern,BlockSubDirRegEx.c_str(), ".*");
       }
       FindGlobbedSegments(regexpattern, Bstrings, true);
 #ifdef VERBOSE_FINDER
-      vtkstd::cout << "#######################################################" << "\n";
-      vtkstd::cout << "Found " << NumberOfBlocks << " Block files \n";
-      vtkstd::cout << "#######################################################" << "\n";
+      std::cout << "#######################################################" << "\n";
+      std::cout << "Found " << NumberOfBlocks << " Block files \n";
+      std::cout << "#######################################################" << "\n";
       for (stringlist::iterator it=Bstrings.begin(); it!=Bstrings.end(); ++it) {
-//          vtkstd::cout << (*it).c_str() << "\n";
+//          std::cout << (*it).c_str() << "\n";
       }
 #endif
     }
   }
   // Var
   if (VarIndex!=-1) {
-    vtkstd::string globpattern = GenerateGlobString(VarIndex, regexmatches, false);
+    std::string globpattern = GenerateGlobString(VarIndex, regexmatches, false);
     if (glob.FindFiles(globpattern)) {
       Vstrings = glob.GetFiles();
       NumberOfVars = (int)Vstrings.size();
-      vtkstd::string regexpattern = GenerateGlobString(VarIndex, regexmatches, true);
+      std::string regexpattern = GenerateGlobString(VarIndex, regexmatches, true);
       FindGlobbedSegments(regexpattern, Vstrings, false);
 #ifdef VERBOSE_FINDER
-      vtkstd::cout << "#######################################################" << "\n";
-      vtkstd::cout << "Found " << NumberOfVars << " Var files \n";
-      vtkstd::cout << "#######################################################" << "\n";
+      std::cout << "#######################################################" << "\n";
+      std::cout << "Found " << NumberOfVars << " Var files \n";
+      std::cout << "#######################################################" << "\n";
       for (stringlist::iterator it=Vstrings.begin(); it!=Vstrings.end(); ++it) {
-//          vtkstd::cout << (*it).c_str() << "\n";
+//          std::cout << (*it).c_str() << "\n";
       }
 #endif
     }
@@ -354,16 +354,16 @@ void XdmfFileSeriesFinder::TestFilenameGeneration()
   //
   //
   //
-  vtkstd::cout << "#######################################################" << "\n";
-  vtkstd::cout << "Testing Filename Generation" << "\n";
-  vtkstd::cout << "#######################################################" << "\n";
+  std::cout << "#######################################################" << "\n";
+  std::cout << "Testing Filename Generation" << "\n";
+  std::cout << "#######################################################" << "\n";
   int t=0, b=0, v=0;
   do {
     b=0;
     do {
       v=0;
       do {
-        vtkstd::cout << this->GenerateFileName(t, b, v).c_str() << vtkstd::endl;
+        std::cout << this->GenerateFileName(t, b, v).c_str() << std::endl;
       } while (++v<NumberOfVars);
     } while (++b<NumberOfBlocks);
   } while (++t<NumberOfTimeSteps);
@@ -387,7 +387,7 @@ int XdmfFileSeriesFinder::GetNumberOfVars()
 double XdmfFileSeriesFinder::GetTimeValue(int index)
 {
   if (index>=0 && index<this->NumberOfTimeSteps) {
-    vtkstd::stringstream t;
+    std::stringstream t;
     t << Tstrings[index];
     double v;
     t >> v;
@@ -396,11 +396,11 @@ double XdmfFileSeriesFinder::GetTimeValue(int index)
   return 0.0;
 }
 //----------------------------------------------------------------------------
-void XdmfFileSeriesFinder::GetTimeValues(vtkstd::vector<double> &values)
+void XdmfFileSeriesFinder::GetTimeValues(std::vector<double> &values)
 {
   values.clear();
   for (int i=0; i<this->NumberOfTimeSteps; i++) {
-    vtkstd::stringstream t;
+    std::stringstream t;
     t << Tstrings[i];
     double v;
     t >> v;
@@ -416,9 +416,9 @@ int main_test(int argc, char **argv)
   finder.TestFilenameGeneration();
   //
   int T = finder.GetNumberOfTimeSteps();
-  vtkstd::cout << T << " " << finder.GetNumberOfBlocks() << " " << finder.GetNumberOfVars() << " ";
+  std::cout << T << " " << finder.GetNumberOfBlocks() << " " << finder.GetNumberOfVars() << " ";
   for (int t=0; t<T; t++) {
-    vtkstd::cout << finder.GenerateFileName(t,0,0).c_str() << vtkstd::endl;
+    std::cout << finder.GenerateFileName(t,0,0).c_str() << std::endl;
   }
   
 
@@ -430,8 +430,8 @@ int main_test(int argc, char **argv)
   bool multitime  = (NumberOfTimeSteps>0);
 
   std::vector<double> time_values;
-  typedef vtkstd::vector< vtkSmartPointer<vtkASCIIParticleReader> > varReader;
-  typedef vtkstd::vector< varReader > blockReader;
+  typedef std::vector< vtkSmartPointer<vtkASCIIParticleReader> > varReader;
+  typedef std::vector< varReader > blockReader;
   blockReader readers;
   t=0;
   b=0;
@@ -441,7 +441,7 @@ int main_test(int argc, char **argv)
     do {
       vtkSmartPointer<vtkASCIIParticleReader> reader = vtkSmartPointer<vtkASCIIParticleReader>::New();
       varreaders.push_back(reader);     
-      vtkstd::string filename = GenerateFileName(t, b, v);
+      std::string filename = GenerateFileName(t, b, v);
       reader->SetFileName(filename.c_str());
       reader->SetFieldNames(FieldNames.c_str());
       reader->SetFieldIndices(FieldIndices.c_str());
@@ -491,13 +491,13 @@ int main_test(int argc, char **argv)
       do { // Var
         std::cout << "Reading Var " << v << std::endl;
         reader = readers[b][v];
-        vtkstd::string filename = GenerateFileName(t,b,v);
+        std::string filename = GenerateFileName(t,b,v);
 	      reader->SetFileName(filename.c_str());
         if (!multitime) {
           reader->SetTimeStep(t);
         }
         reader->Update();
-        vtkstd::vector<double> values;
+        std::vector<double> values;
 	      reader->GetTimeStepValues(values);
         if (values.size()>0) time_values[t] = values[0];
 
@@ -527,7 +527,7 @@ int main_test(int argc, char **argv)
       IdScalars->SetName("PointIdFlags");
       double scalar = 0.0;
       for (int i=0; i<realData->GetNumberOfPoints(); i++) {
-        for (vtkstd::map<long int, double>::iterator it=idMap.begin(); it!=idMap.end(); ++it) {
+        for (std::map<long int, double>::iterator it=idMap.begin(); it!=idMap.end(); ++it) {
           if (i<=it->first) {
             scalar = it->second;
             IdScalars->InsertNextTuple1(scalar);
