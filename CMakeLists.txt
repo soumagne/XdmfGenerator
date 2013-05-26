@@ -58,7 +58,7 @@ set_target_properties(XdmfGenerator
 IF(USE_H5FD_DSM)
   TARGET_LINK_LIBRARIES(XdmfGenerator H5FDdsm)
 ENDIF(USE_H5FD_DSM)
-TARGET_LINK_LIBRARIES(XdmfGenerator Xdmf vtksys)
+TARGET_LINK_LIBRARIES(XdmfGenerator vtkxdmf2 vtksys)
 
 ADD_EXECUTABLE(XdmfGenerate ${CMAKE_CURRENT_SOURCE_DIR}/XdmfGenerate.cxx)
 TARGET_LINK_LIBRARIES(XdmfGenerate XdmfGenerator)
