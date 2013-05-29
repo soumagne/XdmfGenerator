@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
   XdmfGenerator      *xdmfGenerator = new XdmfGenerator();
   const char         *lxdmfFileName = argv[1];
   const char         *hdfFileName = argv[2];
-  int                 isCollection = 1;
+  int                 isCollection = 0;
 
   if (argc == 4) {
     isCollection = atoi(argv[3]);
