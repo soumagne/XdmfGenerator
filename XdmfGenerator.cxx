@@ -55,14 +55,15 @@ typedef struct attribNodeInfo {
   XdmfXmlNode attributeDINode;
   std::string path;
   std::string name;
+  std::string center; //peter
   int AttributeType;
   std::string DataXML;
   //
-  attribNodeInfo(XdmfXmlNode t, XdmfXmlNode h, const char *p, std::string n, int a, const char *xml) :
+  attribNodeInfo(XdmfXmlNode t, XdmfXmlNode h, const char *p, std::string n,const char * cen, int a, const char *xml) :
   attribNode(t), attributeDINode(h), name(n), AttributeType(a), DataXML(xml)
   {
-    path = "";
     if (p) path = p; 
+    if (cen) center = cen;
   };
 } attribNodeInfo;
 //----------------------------------------------------------------------------
@@ -397,6 +398,7 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
         // Set Attribute Name, use one from template if it exists
         XdmfConstString attributeName = lXdmfDOM->GetAttribute(attributeNode, "Name");
         XdmfConstString attribtype    = lXdmfDOM->GetAttribute(attributeNode, "AttributeType");
+        XdmfConstString attribCenter  = lXdmfDOM->GetAttribute(attributeNode, "Center");
         XdmfConstString attributePath = lXdmfDOM->GetCData(attributeDINode);
         //
         // for wildcards, find all the nodes in the HDF dump XML
@@ -410,7 +412,9 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
             vtksys::SystemTools::ReplaceString(path,"*",name);
             int atype = this->FindAttributeType(hdfDOM, node, lXdmfDOM, attributeNode);
             // push a wildcard attribute (the node points to hdf xml, not template xml
-            attributes.push_back(attribNodeInfo(node,attributeDINode,path.c_str(),name,atype,""));
+            attributes.push_back(attribNodeInfo(node,attributeDINode
+            	    ,path.c_str(),name,attribCenter,atype,"")); 
+            // peter TODO  step this
             node = node->next;
           }
         }
@@ -425,10 +429,12 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
             int atype = this->FindAttributeType(hdfDOM, hdfAttributeNode, lXdmfDOM, attributeNode);
             if (!attributeName) {
               std::string temp = vtksys::SystemTools::GetFilenameName(attributePath);
-              attributes.push_back(attribNodeInfo(attributeNode,attributeDINode,attributePath,temp,atype, ""));
+              attributes.push_back(attribNodeInfo(attributeNode,attributeDINode
+              	      ,attributePath,temp,attribCenter,atype, ""));
+              //peter verified
             }
-            else {
-              attributes.push_back(attribNodeInfo(attributeNode,attributeDINode,attributePath,attributeName,atype, ""));
+            else {// peter added Center
+              attributes.push_back(attribNodeInfo(attributeNode,attributeDINode,attributePath,attributeName,attribCenter,atype, ""));
             }
           }
           else if (attributeDIType==XDMF_ITEM_FUNCTION) {
@@ -475,13 +481,14 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
                 "ItemType=\"Function\">" +
                 dataItemCData +
                 "</DataItem>";
-
-            attributes.push_back(attribNodeInfo(attributeNode,attributeDINode,attributePath,attributeName,XDMF_ATTRIBUTE_TYPE_VECTOR,dataItem.c_str()));
+            // peter. verified this call
+            attributes.push_back(attribNodeInfo(attributeNode,attributeDINode,attributePath,attributeName,attribCenter,XDMF_ATTRIBUTE_TYPE_VECTOR,dataItem.c_str()));
             free(functionName);
           }
         }
         if (attributeName) free((void*)attributeName);
         if (attribtype) free((void*)attribtype);
+        if(attribCenter) free((void*)  attribCenter);
       }
     }
 
@@ -491,7 +498,7 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
       XdmfXmlNode attributeDINode = (*it).attributeDINode;
       std::string path = (*it).path;
       std::string name = (*it).name;
-
+      std::string cen  = (*it).center;
       //
       XdmfAttribute *attribute = new XdmfAttribute();
       attribute->SetName(name.c_str());
@@ -519,7 +526,14 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
       }
 
       // Set node center by default at the moment
-      attribute->SetAttributeCenter(XDMF_ATTRIBUTE_CENTER_NODE);
+      // peter
+      // std::cout<<"attribCenter is "<<cen.c_str()<<endl;
+      if (cen.size())
+        attribute->SetAttributeCenterFromString(cen.c_str());	
+      else
+        attribute->SetAttributeCenter(XDMF_ATTRIBUTE_CENTER_NODE);
+ 
+
       //
       // when using wildcards, we must use the attribute type scalar/vector/tensor from
       // the wildcard node as we can't guess it well from the dataset
