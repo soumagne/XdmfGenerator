@@ -1,0 +1,173 @@
+<Xdmf>
+  <!--Begin of segment 01 definition-->
+  <Grid Name="segment_01" GridType="Uniform">
+    <Topology
+       TopologyType="3DCORECTMESH" Dimensions="@Density@Dimensions">
+    </Topology>
+    <Geometry GeometryType="ORIGIN_DXDYDZ" >
+      <DataItem Name="Origin" NumberType="Float" Dimensions="3" Format="XML">
+        0 -3E7 -3E7
+      </DataItem>
+      <DataItem Name="Spacing" NumberType="Float" Dimensions="3" Format="XML">
+        100000 100000 100000
+      </DataItem>
+    </Geometry>
+    <Attribute Name="Density" AttributeType="Scalar" >
+      <DataItem>/segments/01/scalars/dens</DataItem>
+    </Attribute>
+    <Attribute Name="Entropy" AttributeType="Scalar" >
+      <DataItem>/segments/01/scalars/entr</DataItem>
+    </Attribute>
+    <Attribute Name="Electron Fraction" AttributeType="Scalar" >
+      <DataItem>/segments/01/scalars/ye</DataItem>
+    </Attribute>
+    <Attribute Name="Gravitational Potential" AttributeType="Scalar" >
+      <DataItem>/segments/01/scalars/gpot</DataItem>
+    </Attribute>
+    <Attribute Name="Divergence" AttributeType="Scalar" >
+      <DataItem>/segments/01/scalars/divb</DataItem>
+    </Attribute>
+    <Attribute Name="Velocity" AttributeType="Vector" >
+      <DataItem>/segments/01/vectors/vel</DataItem>
+    </Attribute>
+    <Attribute Name="Magnetic Field" AttributeType="Vector" >
+      <DataItem>/segments/01/vectors/bfield</DataItem>
+    </Attribute>
+  </Grid>
+  <Grid Name="segment_02" GridType="Uniform">
+    <Topology
+       TopologyType="3DCORECTMESH" Dimensions="@Density@Dimensions">
+    </Topology>
+    <Geometry GeometryType="ORIGIN_DXDYDZ" >
+      <DataItem Name="Origin" NumberType="Float" Dimensions="3" Format="XML">
+        -3E7 0 -3E7
+      </DataItem>
+      <DataItem Name="Spacing" NumberType="Float" Dimensions="3" Format="XML">
+        100000 100000 100000
+      </DataItem>
+    </Geometry>
+    <Attribute Name="Density" AttributeType="Scalar" >
+      <DataItem>/segments/02/scalars/dens</DataItem>
+    </Attribute>
+    <Attribute Name="Entropy" AttributeType="Scalar" >
+      <DataItem>/segments/02/scalars/entr</DataItem>
+    </Attribute>
+    <Attribute Name="Electron Fraction" AttributeType="Scalar" >
+      <DataItem>/segments/02/scalars/ye</DataItem>
+    </Attribute>
+    <Attribute Name="Gravitational Potential" AttributeType="Scalar" >
+      <DataItem>/segments/02/scalars/gpot</DataItem>
+    </Attribute>
+    <Attribute Name="Divergence" AttributeType="Scalar" >
+      <DataItem>/segments/02/scalars/divb</DataItem>
+    </Attribute>
+    <Attribute Name="Velocity" AttributeType="Vector" >
+      <DataItem>/segments/02/vectors/vel</DataItem>
+    </Attribute>
+    <Attribute Name="Magnetic Field" AttributeType="Vector" >
+      <DataItem>/segments/02/vectors/bfield</DataItem>
+    </Attribute>
+  </Grid>
+  <Grid Name="segment_03" GridType="Uniform">
+    <Topology
+       TopologyType="3DCORECTMESH" Dimensions="@Density@Dimensions">
+    </Topology>
+    <Geometry GeometryType="ORIGIN_DXDYDZ" >
+      <DataItem Name="Origin" NumberType="Float" Dimensions="3" Format="XML">
+        -3E7 -3E7 0
+      </DataItem>
+      <DataItem Name="Spacing" NumberType="Float" Dimensions="3" Format="XML">
+        100000 100000 100000
+      </DataItem>
+    </Geometry>
+    <Attribute Name="Density" AttributeType="Scalar" >
+      <DataItem>/segments/03/scalars/dens</DataItem>
+    </Attribute>
+    <Attribute Name="Entropy" AttributeType="Scalar" >
+      <DataItem>/segments/03/scalars/entr</DataItem>
+    </Attribute>
+    <Attribute Name="Electron Fraction" AttributeType="Scalar" >
+      <DataItem>/segments/03/scalars/ye</DataItem>
+    </Attribute>
+    <Attribute Name="Gravitational Potential" AttributeType="Scalar" >
+      <DataItem>/segments/03/scalars/gpot</DataItem>
+    </Attribute>
+    <Attribute Name="Divergence" AttributeType="Scalar" >
+      <DataItem>/segments/03/scalars/divb</DataItem>
+    </Attribute>
+    <Attribute Name="Velocity" AttributeType="Vector" >
+      <DataItem>/segments/03/vectors/vel</DataItem>
+    </Attribute>
+    <Attribute Name="Magnetic Field" AttributeType="Vector" >
+      <DataItem>/segments/03/vectors/bfield</DataItem>
+    </Attribute>
+  </Grid>
+  <Grid Name="segment_04" GridType="Uniform">
+    <Topology
+       TopologyType="3DCORECTMESH" Dimensions="@Density@Dimensions">
+    </Topology>
+    <Geometry GeometryType="ORIGIN_DXDYDZ" >
+      <DataItem Name="Origin" NumberType="Float" Dimensions="3" Format="XML">
+        -6E6 -6E6 -6E6
+      </DataItem>
+      <DataItem Name="Spacing" NumberType="Float" Dimensions="3" Format="XML">
+        100000 100000 100000
+      </DataItem>
+    </Geometry>
+    <Attribute Name="Density" AttributeType="Scalar" >
+      <DataItem>/segments/04/scalars/dens</DataItem>
+    </Attribute>
+    <Attribute Name="Entropy" AttributeType="Scalar" >
+      <DataItem>/segments/04/scalars/entr</DataItem>
+    </Attribute>
+    <Attribute Name="Electron Fraction" AttributeType="Scalar" >
+      <DataItem>/segments/04/scalars/ye</DataItem>
+    </Attribute>
+    <Attribute Name="Gravitational Potential" AttributeType="Scalar" >
+      <DataItem>/segments/04/scalars/gpot</DataItem>
+    </Attribute>
+    <Attribute Name="Divergence" AttributeType="Scalar" >
+      <DataItem>/segments/04/scalars/divb</DataItem>
+    </Attribute>
+    <Attribute Name="Velocity" AttributeType="Vector" >
+      <DataItem>/segments/04/vectors/vel</DataItem>
+    </Attribute>
+    <Attribute Name="Magnetic Field" AttributeType="Vector" >
+      <DataItem>/segments/04/vectors/bfield</DataItem>
+    </Attribute>
+  </Grid>
+  <Grid Name="segment_dov" GridType="Uniform">
+    <Topology
+       TopologyType="3DCORECTMESH" Dimensions="@Density@Dimensions">
+    </Topology>
+    <Geometry GeometryType="ORIGIN_DXDYDZ" >
+      <DataItem Name="Origin" NumberType="Float" Dimensions="3" Format="XML">
+        -3E7 -3E7 -3E7
+      </DataItem>
+      <DataItem Name="Spacing" NumberType="Float" Dimensions="3" Format="XML">
+        500000 500000 500000
+      </DataItem>
+    </Geometry>
+    <Attribute Name="Density" AttributeType="Scalar" >
+      <DataItem>/segments/dov/scalars/dens</DataItem>
+    </Attribute>
+    <Attribute Name="Entropy" AttributeType="Scalar" >
+      <DataItem>/segments/dov/scalars/entr</DataItem>
+    </Attribute>
+    <Attribute Name="Electron Fraction" AttributeType="Scalar" >
+      <DataItem>/segments/dov/scalars/ye</DataItem>
+    </Attribute>
+    <Attribute Name="Gravitational Potential" AttributeType="Scalar" >
+      <DataItem>/segments/dov/scalars/gpot</DataItem>
+    </Attribute>
+    <Attribute Name="Divergence" AttributeType="Scalar" >
+      <DataItem>/segments/dov/scalars/divb</DataItem>
+    </Attribute>
+    <Attribute Name="Velocity" AttributeType="Vector" >
+      <DataItem>/segments/dov/vectors/vel</DataItem>
+    </Attribute>
+    <Attribute Name="Magnetic Field" AttributeType="Vector" >
+      <DataItem>/segments/dov/vectors/bfield</DataItem>
+    </Attribute>
+  </Grid>
+</Xdmf>

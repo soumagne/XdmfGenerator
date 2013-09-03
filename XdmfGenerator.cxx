@@ -288,7 +288,8 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
           XdmfDebug("Skipping node of path " << topologyPath);
           continue;
         }
-        XdmfConstString topologyData = this->FindDataItemInfo(hdfDOM, hdfTopologyNode, hdfFileName, topologyPath, lXdmfDOM, topologyDINode);
+        std::string dimstring;
+        XdmfConstString topologyData = this->FindDataItemInfo(hdfDOM, hdfTopologyNode, hdfFileName, topologyPath, lXdmfDOM, topologyDINode, dimstring);
         topology->SetNumberOfElements(this->FindNumberOfCells(hdfDOM, hdfTopologyNode, topologyTypeStr));
         topology->SetDataXml(topologyData);
         if (topologyData) delete []topologyData;
@@ -300,8 +301,23 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
       free(topologyBaseOffset);
     }
 
+    //
+    // an entry such as TopologyType="3DCORECTMESH" Dimensions="@Density@Dimensions">
+    // tells the generator to use the dimensions of the attribute "Density" as the dimensions of this dataset
+    //
+    bool topologymatching = false;
+    std::string topologyattribute;
+    XdmfString topologyDimensions = (XdmfString) lXdmfDOM->GetAttribute(topologyNode, "Dimensions");
+    if (topologyDimensions) {
+      vtksys::RegularExpression pattern1("@(.*)@Dimensions");
+      if (pattern1.find(topologyDimensions)) {
+        topologymatching = true;
+        topologyattribute = pattern1.match(1); 
+      }
+    }
+
     // Look for Geometry
-    geometry = grid->GetGeometry();
+    geometry = grid->GetGeometry(); 
     geometryTypeStr = (XdmfString) lXdmfDOM->GetAttribute(geometryNode, "GeometryType");
     geometry->SetGeometryTypeFromString(geometryTypeStr);
     if (geometryTypeStr) free(geometryTypeStr);
@@ -311,9 +327,27 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
     if (format && !xmlStrcmp((const xmlChar*)(format), BAD_CAST("XML"))) {
       // copy XML data direct to output
       free(format);
-      XdmfString geometryData = (XdmfString)lXdmfDOM->Serialize(geometryDINode);
-      geometry->SetDataXml(geometryData);
-//        free(topologyData);
+      std::string geomstring = "";
+      vtksys::RegularExpression origin("Name=\"Origin\"");
+      vtksys::RegularExpression spacing("Name=\"Spacing\"");
+      vtksys::RegularExpression vector("> *(.*) *</DataItem>");
+      for (int i=0; i<lXdmfDOM->FindNumberOfElements("DataItem", (geometryNode)); i++) {
+        geometryDINode = lXdmfDOM->FindElement("DataItem", i, geometryNode);
+        XdmfString geometryData = (XdmfString)lXdmfDOM->Serialize(geometryDINode);
+        if (vector.find(geometryData)) {
+          XdmfFloat64 vec[3];
+          std::stringstream temp;
+          temp << vector.match(1) << std::ends;
+          temp >> vec[0] >> vec[1] >> vec[2];
+          if (origin.find(geometryData)) {
+            geometry->SetOrigin(vec);
+          }
+          if (spacing.find(geometryData)) {
+            geometry->SetDxDyDz(vec);
+          }
+        }
+      }     
+      //      free(geometryData);
     }
     else {
       // we might need to read multiple items for x/y/z sizes (2-3 or more dimensions)
@@ -328,7 +362,8 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
           abortgrid = true;
           continue;
         }
-        XdmfConstString geometryData = this->FindDataItemInfo(hdfDOM, hdfGeometryNode, hdfFileName, geometryPath, lXdmfDOM, geometryDINode);
+        std::string dimstring;
+        XdmfConstString geometryData = this->FindDataItemInfo(hdfDOM, hdfGeometryNode, hdfFileName, geometryPath, lXdmfDOM, geometryDINode, dimstring);
         if (geometryData) {
           geomXML += geometryData;
           delete []geometryData;
@@ -466,7 +501,8 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
               // Get Item info
               subDataItemHDFPath = lXdmfDOM->GetCData(subDataItemNode);
               hdfSubDataItemNode = this->FindConvertHDFPath(hdfDOM, subDataItemHDFPath);
-              XdmfConstString subDataItemData = this->FindDataItemInfo(hdfDOM, hdfSubDataItemNode, hdfFileName, subDataItemHDFPath, lXdmfDOM, subDataItemNode);
+              std::string dimstring;
+              XdmfConstString subDataItemData = this->FindDataItemInfo(hdfDOM, hdfSubDataItemNode, hdfFileName, subDataItemHDFPath, lXdmfDOM, subDataItemNode,dimstring);
               if (subDataItemData) {
                 dataItemCData += subDataItemData;
                 delete []subDataItemData;
@@ -520,9 +556,15 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
         }
 
         // Get Attribute info
-        XdmfConstString attributeData = this->FindDataItemInfo(hdfDOM, attributeNode, hdfFileName, path.c_str(), lXdmfDOM, attributeDINode);
+        std::string dimstring;
+        XdmfConstString attributeData = this->FindDataItemInfo(hdfDOM, attributeNode, hdfFileName, path.c_str(), lXdmfDOM, attributeDINode, dimstring);
         attribute->SetDataXml(attributeData);
         if (attributeData) delete []attributeData;
+
+        if (name==topologyattribute && topologymatching) {
+          std::string topostring = "<Topology TopologyType=\"3DCORECTMESH\" Dimensions = \"" + dimstring + "\" />";
+          topology->GetShapeDesc()->SetShapeFromString(dimstring.c_str());
+        }
       }
 
       // Set node center by default at the moment
@@ -674,7 +716,7 @@ XdmfInt32 XdmfGenerator::FindNumberOfCells(XdmfHDFDOM *hdfDOM,
 }
 //----------------------------------------------------------------------------
 XdmfConstString XdmfGenerator::FindDataItemInfo(XdmfHDFDOM *hdfDOM, XdmfXmlNode hdfDatasetNode,
-    XdmfConstString hdfFileName, XdmfConstString dataPath, XdmfDOM *lXdmfDOM, XdmfXmlNode templateNode)
+    XdmfConstString hdfFileName, XdmfConstString dataPath, XdmfDOM *lXdmfDOM, XdmfXmlNode templateNode, std::string &dimstring)
 {
   XdmfXmlNode hdfDataspaceNode = NULL, hdfDatatypeNode = NULL;
   XdmfString nDimsStr, dataPrecisionStr, dataItemStr;
@@ -700,6 +742,7 @@ XdmfConstString XdmfGenerator::FindDataItemInfo(XdmfHDFDOM *hdfDOM, XdmfXmlNode 
     if (i != (nDims-1)) dimSize += " ";
     if (dimSizeStr) free(dimSizeStr);
   }
+  dimstring = dimSize;
 
   hdfDatatypeNode = hdfDOM->FindElement("DataType", 0, hdfDatasetNode);
   if (!hdfDatatypeNode) {

@@ -93,7 +93,7 @@ protected:
   // and the path of this node as defined in the light XDMF template
   XdmfConstString  FindDataItemInfo(XdmfHDFDOM *hdfDOM, XdmfXmlNode hdfDatasetNode,
       XdmfConstString hdfFileName, XdmfConstString dataPath,
-      XdmfDOM *lXdmfDOM, XdmfXmlNode templateNode);
+      XdmfDOM *lXdmfDOM, XdmfXmlNode templateNode, std::string &dimstring);
 
   // Find attribute type from a given dataset node of the HDF DOM
   XdmfInt32 FindAttributeType(XdmfHDFDOM *hdfDOM, XdmfXmlNode hdfDatasetNode,
