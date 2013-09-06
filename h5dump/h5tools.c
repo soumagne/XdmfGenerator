@@ -372,7 +372,7 @@ h5tools_close(void)
 
         /* Shut down the library */
 #ifndef H5_HAVE_DSM
-        H5close();
+//        H5close();
 #endif
 
         h5tools_init_g = 0;
