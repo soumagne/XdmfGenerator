@@ -31,6 +31,7 @@
 #include "XdmfDOM.h"
 #include "XdmfRoot.h"
 #include "XdmfDomain.h"
+#include "hdf5.h"
 
 class XdmfHDFDOM;
 class XdmfGrid;
@@ -101,6 +102,9 @@ protected:
 
   // Find data item type from a given dataset node of the HDF DOM
   XdmfInt32 FindDataItemType(XdmfDOM *lXdmfDOM, XdmfXmlNode dataItemNode);
+
+  double GetExpressionValue(const char *filename, std::string &dataset, std::string &indices);
+  double ReadExpressionData(const hid_t &file_id, std::string &dataset, int n1, int n2, char op);
 
   XdmfDOM             GeneratedDOM;
   XdmfString          GeneratedFile;

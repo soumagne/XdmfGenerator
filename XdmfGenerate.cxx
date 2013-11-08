@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
   const char         *hdfFileName = argv[2];
   int                 isCollection = 0;
 
-  if (argc == 4) {
+  if (argc >= 4) {
     isCollection = atoi(argv[3]);
   }
 

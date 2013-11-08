@@ -44,6 +44,8 @@
 #include "H5FDdsmManager.h"
 #endif
 #include "XdmfDump.h"
+#include "hdf5.h"
+#include "hdf5_hl.h"
 
 #include "FileSeriesFinder.h"
 
@@ -76,7 +78,7 @@ XdmfGenerator::XdmfGenerator()
   this->ExtRegEx        = NULL;
   this->UseFullHDF5Path = XDMF_TRUE;
   // default file type: output.0000.h5
-  this->SetPrefixRegEx("(.+).");
+  this->SetPrefixRegEx("(.*)[^0-9]");
   this->SetTimeRegEx("([0-9]+)");
   this->SetExtRegEx("([.]h5)");
 
@@ -142,7 +144,7 @@ XdmfInt32 XdmfGenerator::GenerateTemporalCollection(XdmfConstString lXdmfFile,
   // TODO use time values of files eventually
   fileFinder->GetTimeValues(timeStepValues);
 
-  // std::cerr << "Number of TimeSteps: " <<fileFinder->GetNumberOfTimeSteps() << std::endl;
+  std::cerr << "Number of TimeSteps: " <<fileFinder->GetNumberOfTimeSteps() << std::endl;
   for (int i=0; i<fileFinder->GetNumberOfTimeSteps(); i++) {
     // std::cerr << "Generate file name for time step: " << timeStepValues[i] << std::endl;
     std::string currentHdfFile = fileFinder->GenerateFileName(i);
@@ -331,14 +333,33 @@ XdmfInt32 XdmfGenerator::Generate(XdmfConstString lXdmfFile, XdmfConstString hdf
       vtksys::RegularExpression origin("Name=\"Origin\"");
       vtksys::RegularExpression spacing("Name=\"Spacing\"");
       vtksys::RegularExpression vector("> *(.*) *</DataItem>");
+      vtksys::RegularExpression expression("@([^@]*)@\\[(.*)\\]");
       for (int i=0; i<lXdmfDOM->FindNumberOfElements("DataItem", (geometryNode)); i++) {
         geometryDINode = lXdmfDOM->FindElement("DataItem", i, geometryNode);
         XdmfString geometryData = (XdmfString)lXdmfDOM->Serialize(geometryDINode);
         if (vector.find(geometryData)) {
           XdmfFloat64 vec[3];
           std::stringstream temp;
-          temp << vector.match(1) << std::ends;
-          temp >> vec[0] >> vec[1] >> vec[2];
+          std::string vecstring = vector.match(1);
+          temp << vecstring.c_str() << std::ends;
+//          std::cout << "Setting vector data to " << vector.match(1) << std::endl;
+          if (expression.find( vecstring.c_str())) {
+            std::vector<std::string> vlist;
+            vtksys::SystemTools::Split(vecstring.c_str(), vlist);
+            int index=0;
+            for (int i=0; i<vlist.size(); i++) {
+              if (expression.find( vlist[i].c_str())) {
+                std::string m1 = expression.match(1);
+                std::string m2 = expression.match(2);
+                // this is a reference into a dataset, so we must open it and read the value
+//                std::cout << "Found dataset " << m1.c_str() << " with indices " << m2.c_str() << std::endl;
+                vec[index++] = this->GetExpressionValue(hdfFileName, m1, m2);
+              }
+            }
+          }
+          else {
+            temp >> vec[0] >> vec[1] >> vec[2];
+            }
           if (origin.find(geometryData)) {
             geometry->SetOrigin(vec);
           }
@@ -874,4 +895,44 @@ XdmfInt32 XdmfGenerator::FindDataItemType(XdmfDOM *lXdmfDOM, XdmfXmlNode dataIte
   return XDMF_ITEM_UNIFORM;
 }
 //----------------------------------------------------------------------------
+double XdmfGenerator::GetExpressionValue(const char *filename, std::string &dataset, std::string &indices)
+{
+  // look for num1 [ +-*/ num2 ] simple binary math expressions only
+  vtksys::RegularExpression expression("([0-9]+)([\-\+\*/])*([0-9]*)");
+  int n1,n2;
+  char op = ' ';
+  if (expression.find(indices.c_str())) {
+    n1 = (expression.match(1).size()>0) ? atoi(expression.match(1).c_str()) : 0;
+    n2 = (expression.match(3).size()>0) ? atoi(expression.match(3).c_str()) : 0;
+    op = (expression.match(2).size()>0) ? expression.match(2)[0] : ' ';
+  }
+  hid_t file_id = H5Fopen(filename, H5F_ACC_RDONLY,H5P_DEFAULT);
+  double val = this->ReadExpressionData(file_id, dataset, n1, n2, op);
+  H5Fclose(file_id);
+  return val;
+}
+//----------------------------------------------------------------------------
+double XdmfGenerator::ReadExpressionData(const hid_t &file_id, std::string &dataset, int n1, int n2, char op)
+{
+  herr_t  status;
+  hsize_t dims[5];
+  int     ndims;
+  // get the dimensions of the dataset 
+  status = H5LTget_dataset_ndims (file_id,dataset.c_str(), &ndims);
+  status = H5LTget_dataset_info(file_id, dataset.c_str(), dims, NULL, NULL);
+  hsize_t data_size = 1;
+  for (int i=0; i<ndims; i++) data_size*=dims[i];
+  std::vector<double> buffer(data_size); 
+
+  /* read dataset */
+  status = H5LTread_dataset_double(file_id, dataset.c_str(), buffer.data());
+
+  switch (op) {
+    case '+' : return buffer[n1] + buffer[n2]; 
+    case '-' : return buffer[n1] - buffer[n2]; 
+    case '*' : return buffer[n1] * buffer[n2]; 
+    case ' ' : return buffer[n1];
+  }
+  return 0;
+}
 
