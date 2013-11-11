@@ -76,9 +76,9 @@ XdmfGenerator::XdmfGenerator()
   this->PrefixRegEx     = NULL;
   this->TimeRegEx       = NULL;
   this->ExtRegEx        = NULL;
-  this->UseFullHDF5Path = XDMF_TRUE;
+  this->UseFullHDF5Path = XDMF_FALSE;
   // default file type: output.0000.h5
-  this->SetPrefixRegEx("(.*)[^0-9]");
+  this->SetPrefixRegEx("(.*_)");
   this->SetTimeRegEx("([0-9]+)");
   this->SetExtRegEx("([.]h5)");
 
@@ -927,10 +927,13 @@ double XdmfGenerator::ReadExpressionData(const hid_t &file_id, std::string &data
   /* read dataset */
   status = H5LTread_dataset_double(file_id, dataset.c_str(), buffer.data());
 
+  std::cerr << buffer[n1] << " : " << buffer[n2] << " " << (buffer[n2]-buffer[n1]) << std::endl;
+
   switch (op) {
     case '+' : return buffer[n1] + buffer[n2]; 
     case '-' : return buffer[n1] - buffer[n2]; 
     case '*' : return buffer[n1] * buffer[n2]; 
+    case '/' : return buffer[n1] / buffer[n2]; 
     case ' ' : return buffer[n1];
   }
   return 0;
