@@ -78,7 +78,7 @@ XdmfGenerator::XdmfGenerator()
   this->ExtRegEx        = NULL;
   this->UseFullHDF5Path = XDMF_FALSE;
   // default file type: output.0000.h5
-  this->SetPrefixRegEx("(.*_)");
+  this->SetPrefixRegEx("(.*)[^0-9]");
   this->SetTimeRegEx("([0-9]+)");
   this->SetExtRegEx("([.]h5)");
 

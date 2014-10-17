@@ -5,7 +5,12 @@ CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
 IF(COMMAND CMAKE_POLICY)
   CMAKE_POLICY(SET CMP0003 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
-  
+
+find_package(HDF5)
+if(WIN32)
+  link_directories("C:/Program Files/H5FDdsm/lib")
+endif()
+
 #--------------------------------------------------
 # Load ParaView env
 #--------------------------------------------------

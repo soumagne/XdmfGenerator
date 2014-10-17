@@ -493,8 +493,8 @@ h5tools_get_fapl(hid_t fapl, const char *driver, unsigned *drivernum)
         if(!h5tools_mpi_init_g)
             MPI_Initialized(&h5tools_mpi_init_g);
         if(h5tools_mpi_init_g) {
-            if(H5Pset_fapl_mpiposix(new_fapl, MPI_COMM_WORLD, TRUE) < 0)
-                goto error;
+//            if(H5Pset_fapl_mpiposix(new_fapl, MPI_COMM_WORLD, TRUE) < 0)
+//                goto error;
 
             if(drivernum)
                 *drivernum = MPIPOSIX_IDX;
