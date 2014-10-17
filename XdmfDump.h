@@ -32,6 +32,8 @@ class H5FDdsmManager;
 #include <cstring>
 #include <sstream>
 
+using namespace xdmf2;
+
 class XDMF_EXPORT XdmfDump : public XdmfObject {
 
     public :

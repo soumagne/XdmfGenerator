@@ -56,6 +56,8 @@
 #include "XdmfGeneratorconfig.h"
 #include "XdmfLightData.h"
 
+using namespace xdmf2;
+
 class XdmfHDFDOM : public XdmfLightData {
 
 public :

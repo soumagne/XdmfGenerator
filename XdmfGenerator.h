@@ -33,8 +33,13 @@
 #include "XdmfDomain.h"
 #include "hdf5.h"
 
+namespace xdmf2 {
+  class XdmfGrid;
+};
+
+using namespace xdmf2;
+
 class XdmfHDFDOM;
-class XdmfGrid;
 class H5FDdsmManager;
 
 class XDMF_EXPORT XdmfGenerator : public XdmfObject
@@ -76,7 +81,7 @@ public:
   // Generate an XDMF File from a template file and an HDF file
   // Put the result into an XDMF DOM
   XdmfInt32        Generate(XdmfConstString lXdmfFile, XdmfConstString hdfFileName,
-      XdmfGrid *temporalGrid=NULL, XdmfInt32 timeValue=0);
+      xdmf2::XdmfGrid *temporalGrid=NULL, XdmfInt32 timeValue=0);
 
 protected:
 
